@@ -1,0 +1,2462 @@
+﻿% * EMT UNTUK STATISTIKA | KELOMPOK 6
+% 
+% K6MAT2022B
+%% 1. Eka Nurhayati (22305141016)
+%% 2. Aura Zahra Sisielia Rahma(22305141026)
+%% 3. Amalia Intan Arvitasari (22305144026)
+%% 4. Assyifa Cahya Marsellita (22305141001)
+%% 5. Ardi Budi Setiawan (22305141017l)
+%% 6. Sherlyta Icha Nadiastuty (22305141013)
+%% 7. Mg. Ribka Yohanna Senduk (22305141038)
+% 
+% ----
+%% ----
+% 
+% Nama  : Eka Nurhayati
+%% NIM   : 22305141016
+%% Kelas : Matematika B
+% 
+% * Subtopik 1 : Menyimpan data dalam bentuk matriks
+% 
+% Pada subtopik 1 ini menjelaskan tentang menyimpan data dalam bentuk
+% matriks untuk dianalisis lebih lanjut.
+%% Untuk itu akan dibahas :
+%% - Penjelasan umum mengenai matriks dalam statistika
+%% - Penggunaan operasi matriks pada persoalan statistika
+%% - Penghitungan lanjutan dengan matriks
+% 
+% ** Array
+% 
+% Dalam statistika, matriks adalah array (daftar) bilangan yang terdiri
+% dari baris-baris dan kolom-kolom. Aljabar matriks adalah aljabar
+% khusus untuk array tersebut. Setiap array diperlakukan sebagai satu
+% entitas yang membuatnya sangat berguna dalam menganalisa data.
+% 
+% EMT hanya memiliki dua dimensi untuk array. Tipe datanya disebut
+% matriks. Akan lebih mudah untuk menulis fungsi untuk dimensi yang
+% lebih tinggi atau library C untuk hal ini.
+% 
+% Dalam EMT, sebuah vektor adalah sebuah matriks dengan satu baris.
+%% Ini bisa dibuat menjadi sebuah matriks dengan redim().
+>shortformat; X=redim(1:20,4,5)
+% Ekstraksi baris dan kolom, atau sub-matriks
+>X[,2:3]
+% Namun, dalam R dimungkinkan untuk mengatur daftar indeks tertentu dari
+% vektor ke suatu nilai. Hal yang sama juga dapat dilakukan dalam EMT
+% hanya dengan sebuah perulangan.
+> 
+% Contoh Soal 1 :
+% 
+% Apabila diketahui matriks Gross Income beberapa Negara (US, Canada,
+% Australia, UK) tahun 1981 dan 1982 adalah sebagai berikut.
+>A=[27,15,18,21;32,14,21,30]
+% dan diketahui matriks pengeluaran sebagai berikut
+>B=[19,9,11,17;22,10,13,24]
+% Berapakah Gross Profit dalam tahun 1981 dan 1982 untuk keempat negara
+% 
+% => untuk menghitung Gross Profit adalah mengurangkan matriks Gross
+% Income dengan matriks pengeluaran. Maka di dapat matriks Gross Profit
+% sebagai berikut :
+>A-B
+>
+% Contoh Soal 2 :
+% 
+% Perhitungan jumlah uang yang diperlukan dalam masalah pembelian tikus,
+% katak, dan kelinci untuk percobaan di departemen biologi dapat
+% menggunakan perkalian matriks.
+%% Misal harga hewan berturut-turut 3, 1, 10 ribu rupiah. Banyak hewan
+% yang diperlukan berturut-turut 50, 100, dan 30 ekor. Berapa jumlah
+% uang yang diperlukan.
+>a=[3;1;10]
+>b=[50;100;30]
+>a*b
+% maka uang yang diperlukan adalah 150+100+300 = 550 ribu rupiah.
+>
+>
+>function setmatrixvalue (M, i, j, v) ...
+$loop 1 to max(length(i),length(j),length(v))
+$   M[i{#},j{#}] = v{#};
+$end;
+$endfunction
+% Ini untuk menunjukkan bahwa matriks dilewatkan dengan referensi di
+% EMT. Jika tidak ingin mengubah matriks asli M, kita perlu menyalinnya
+% dalam fungsi.
+>setmatrixvalue(X,1:3,3:-1:1,0); X,
+% Hasil kali luar dalam EMT hanya dapat dilakukan di antara vektor. Hal
+% ini otomatis karena bahasa matriks. Satu vektor harus berupa vektor
+% kolom dan vektor baris.
+>(1:5)*(1:5)'
+% Dalam pengantar PDF untuk R ada sebuah contoh, yang menghitung
+% distribusi ab-cd untuk a, b, c, d yang dipilih dari 0 sampai n secara
+% acak. Solusinya dalam R adalah membentuk sebuah matriks 4 dimensi dan
+% menjalankan table() di atasnya.
+% 
+% Tentu saja, hal ini bisa dicapai dengan perulangan. Tetapi perulangan
+% tidak efektif dalam EMT. Dalam EMT, kita dapat menulis perulangan
+% dalam C dan itu akan menjadi solusi tercepat.
+% 
+% Tetapi kita ingin meniru perilaku R. Untuk itu, kita perlu meratakan
+% perkalian ab dan membuat matriks ab-cd.
+>a=0:6; b=a'; p=flatten(a*b); q=flatten(p-p'); ...
+>u=sort(unique(q)); f=getmultiplicities(u,q);...
+>statplot(u,f,"h"):
+% Selain kelipatan yang tepat, EMT dapat menghitung frekuensi dalam
+% vektor.
+>getfrequencies(q,-50:10:50)
+% Cara yang paling mudah untuk memplot ini sebagai distribusi adalah
+% sebagai berikut.
+>plot2d(q,distribution=11):
+% Tetapi juga memungkinkan untuk menghitung jumlah dalam interval yang
+% dipilih sebelumnya. Tentu saja, berikut ini menggunakan
+% getfrequencies() secara internal.
+% 
+% Karena fungsi histo() mengembalikan frekuensi, kita perlu
+% menskalakannya sehingga integral di bawah grafik batang adalah 1.
+>{x,y}=histo(q,v=-55:10:55); y=y/sum(y)/differences(x); ...
+>plot2d(x,y,>bar,style="/"):
+>
+% * Sub Topik 2 : Data acak dengan fungsi distribusi
+% 
+% Pada subtopik 2 ini menjelaskan tentang menghasilkan data acak
+% (simulasi) dengan menggunakan fungsi distribusi tertentu
+%% Untuk itu akan dibahas :
+%% - memplot data distribusi eksperimen acak
+%% - distribusi normal
+%% - distribusi diskrit
+% 
+% ** Memplot data distribusi eksperimen acak
+>p=normal(1,1000); //1000 sampel acak berdistribusi normal p
+>plot2d(p,distribution=20,style="\/"); // plot sampel acak p
+>plot2d("qnormal(x,0,1)",add=1): // menambahkan plot distribusi normal standar
+% Perhatikan perbedaan antara plot batang (sampel) dan kurva normal
+% (distribusi sesungguhnya). Masukkan kembali ketiga perintah tersebut
+% untuk melihat hasil pengambilan sampel yang lain.
+>
+% Berikut ini adalah perbandingan 10 simulasi dari 1000 nilai
+% terdistribusi normal dengan menggunakan apa yang disebut plot kotak.
+% Plot ini menunjukkan median, kuartil 25% dan 75%, nilai minimal dan
+% maksimal, serta pencilan (the outliers).
+>p=normal(10,1000); boxplot(p):
+>
+% Untuk menghasilkan bilangan bulat acak, Euler memiliki intrandom.
+% Misal kita simulasikan pelemparan dadu dan plot distribusinya.
+% 
+% Kita menggunakan fungsi getmultiplicities(v,x), yang menghitung
+% seberapa sering elemen-elemen v muncul di dalam x. Kemudian kita
+% memplot hasilnya menggunakan columnsplot().
+>k=intrandom(1,6000,6);  ...
+>columnsplot(getmultiplicities(1:6,k));...
+>ygrid(1000,color=red):
+% Meskipun intrandom(n,m,k) mengembalikan bilangan bulat yang
+% terdistribusi secara seragam dari 1 sampai k, adalah mungkin untuk
+% menggunakan distribusi bilangan bulat yang lain dengan randpint().
+% 
+% Pada contoh berikut, probabilitas untuk 1,2,3 masing-masing adalah
+% 0.4,0.1,0.5.
+>randpint(1,1000,[0.4,0.1,0.5]); getmultiplicities(1:3,%)
+% Sebagai contoh, kita mencoba distribusi eksponensial. Variabel acak
+% kontinu X dikatakan memiliki distribusi eksponensial, jika PDF-nya
+% diberikan oleh
+%% latex: f_X(x)=\lambda e^{-\lambda x},\quad x>0,\quad \lambda>0,
+%% dengan parameter
+%% latex: \lambda=\frac{1}{\mu},\quad \mu \text{ is the mean, and denoted by } X \sim \text{Exponential}(\lambda).
+>
+% ** Distribusi Normal
+% 
+% EMT dapat menghitung banyak distribusi dan inversnya, terutama
+% distribusi normal.
+>plot2d("qnormal(x,1,1.5)",-4,6);  ...
+>plot2d("qnormal(x,1,1.5)",a=2,b=5,>add,>filled):
+% latex: \text{normaldis(x,m,d)}=\int_{-\infty}^x \frac{1}{d\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{t-m}{d})^2}\ dt.
+%% Probabilitas untuk berada di area hijau adalah sebagai berikut.
+>normaldis(5,1,1.5)-normaldis(2,1,1.5)
+% Hal ini dapat dihitung secara numerik dengan integral berikut ini.
+%% latex: \int_2^5 \frac{1}{1.5\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x-1}{1.5})^2}\ dx.
+>gauss("qnormal(x,1,1.5)",2,5)
+>
+% CONTOH :
+% 
+% Pada 1000 lemparan koin, jumlah gambar yang diharapkan terdistribusi
+% dengan nilai rata-rata 500 dan deviasi standar
+% 
+% latex: \sigma=\sqrt{1000\times0.5\times0.5}
+% 
+% Hitunglah probabilitas untuk mendapatkan lebih dari 520 muncul gambar,
+% dan ketika probabilitasnya kurang dari 0,1% approximating distribusi
+% binomial dengan distribusi normal.
+>n=1000; p=0.5;...
+>m=n*p; s=sqrt(n*p*(1-p));...
+>1-normaldis(520,m,s)
+>ceil(invnormaldis(99.9%,m,s))
+% Perhatikan bahwa fungsi normaldis dalam skala EMT dengan cara yang
+% berbeda dari fungsi erf, yang juga tersedia.
+% 
+% Semua distribusi dalam EMT diimplementasikan sebagai fungsi
+% distribusi, dari 0 hingga 1.
+% 
+% Perkiraan untuk distribusi binomial juga dapat dihitung
+>1-bindis(520,1000,0.5)
+>invbindis(99.9%,1000,0.5)
+% Fungsi invbindis() menyelesaikan interpolasi linier antara nilai
+% bilangan bulat.
+>
+% ** Distribusi Diskrit
+% 
+% Untuk menentukan distribusi diskrit, dapat menggunakan metode berikut.
+% 
+% Pertama, tetapkan fungsi distribusinya terlebih dahulu.
+>wd = 0|((1:6)+[-0.01,0.01,0,0,0,0])/6
+% Artinya, dengan probabilitas wd[i+1]-wd[i] kita menghasilkan nilai
+% acak i.
+% 
+% Ini hampir merupakan distribusi yang seragam. Mari kita definisikan
+% sebuah generator bilangan acak untuk ini. Fungsi find(v,x) menemukan
+% nilai x dalam vektor v. Fungsi ini juga dapat digunakan untuk vektor
+% x.
+>function wrongdice (n,m) := find(wd,random(n,m))
+% Kesalahan ini sangat halus sehingga kita hanya bisa melihatnya setelah
+% melakukan iterasi yang sangat banyak.
+>columnsplot(getmultiplicities(1:6,wrongdice(1,1000000))):
+% Berikut ini adalah fungsi sederhana untuk memeriksa distribusi seragam
+% dari nilai 1... K dalam v. Kami menerima hasilnya, jika untuk semua
+% frekuensi
+% 
+% latex: \left|f_i-\frac{1}{K}\right| < \frac{\delta}{\sqrt{n}}.
+>function checkrandom (v, delta=1) ...
+$K=max(v); n=cols(v);
+$fr=getfrequencies(v,1:K);
+$return max(fr/n-1/K)<delta/sqrt(n);
+$endfunction
+% Memang fungsi ini menolak distribusi seragam.
+>checkrandom(wrongdice(1,1000000))
+% Dan ini menerima generator acak bawaan.
+>checkrandom(intrandom(1,1000000,6))
+% Kita dapat menghitung distribusi binomial. Pertama, ada binomialsum(),
+% yang mengembalikan probabilitas i atau kurang dari n percobaan.
+>bindis(410,1000,0.4)
+% Invers Beta function digunakan untuk menghitung interval kepercayaan
+% Clopper-Pearson untuk parameter p. Tingkat defaultnya adalah alpha.
+% 
+% Arti dari interval ini adalah bahwa jika p berada di luar interval,
+% hasil yang diamati dari 410 dalam 1000 jarang terjadi.
+>clopperpearson(410,1000)
+% Perintah berikut ini adalah cara langsung untuk mendapatkan hasil di
+% atas. Tetapi untuk n yang besar, penjumlahan langsung tidak akurat dan
+% lambat.
+>p=0.4; i=0:410; n=1000; sum(bin(n,i)*p^i*(1-p)^(n-i))
+% invbinsum() menghitung invers dari binomialsum().
+>invbindis(0.75,1000,0.4)
+% Dalam Bridge, kita mengasumsikan 5 kartu yang terbuka (dari 52 kartu)
+% di dua tangan (26 kartu). Mari kita hitung probabilitas distribusi
+% yang lebih buruk dari 3:2 (misalnya 0:5, 1:4, 4:1, atau 5:0).
+>2*hypergeomsum(1,5,13,26)
+% Ada juga simulasi distribusi multinomial.
+>randmultinomial(10,1000,[0.4,0.1,0.5])
+% ----
+%% ---
+%% Nama  : Aura Zahra Sisielia Rahma
+%% NIM   : 22305141026
+%% Kelas : Matematika B
+% 
+% * Sub Topik 3 : File Input dan Output (Membaca dan Menulis Data)
+% 
+% Kali ini kita akan belajar bagaimana cara mengimpor matriks data dari
+% sumber lain ke EMT. Fungsi sederhana adalah writematrix() dan
+% readmatrix().
+% 
+% -Fungsi writematrix() digunakan untuk menulis matriks ke dalam file
+% teks. Ini memungkinkan Anda untuk menyimpan data matriks dalam format
+% yang dapat dibaca oleh program lain atau untuk tujuan penyimpanan.
+% 
+% -Fungsi readmatrix() digunakan untuk membaca data matriks dari file
+% teks. Ini memungkinkan Anda untuk mengambil data matriks yang telah
+% disimpan sebelumnya dalam file teks.
+% 
+% 
+% Ditunjukan cara membaca dan menulis vektor real ke dalam file.
+>a=random(1,100)
+>mean(a), dev(a)
+% Seperti yang sudah kita ketahui mean() disini berarti rata-rata.
+%% Rumus mean (rata-rata) adalah
+% 
+% latex: Mean = \frac{sum(data)}{len(data)}
+%% atau jumlah data dibagi banyak data.
+% 
+% Sedangkan dev() merupakan standartdeviasinya.
+%% Rumus standart deviasi adalah
+% 
+% latex: deviasi= [(x-mean)^{2} for x in data]
+%% latex: variasi= \frac{sum(deviasi)}{len(data)}
+%% latex: standard deviasi=\sqrt{variasi}
+>filename="test.dat";
+% Sekarang kita menulis vektor kolom a' ke file. Ini menghasilkan satu
+% nomor di setiap baris file.
+>writematrix(a',filename);
+% Untuk membaca data, kami menggunakan readmatrix().
+>a=readmatrix(filename)';
+% Dan hapus filenya.
+>fileremove(filename);
+>mean(a), dev(a),
+% Contoh lain
+>b= random(1,10)
+>
+>mean(b), dev(b),
+>writematrix(b',filename);
+>b=readmatrix(filename)';
+>fileremove(filename);
+>mean(b), dev(b),
+>c=[2,4,6]; mean(c), dev(c), median(c)
+% Penjelasan:
+% 
+% Mencari rata-ratanya
+%% latex: Rata-rata= \frac{2+4+6}{3}
+%% latex: = \frac{12}{3}
+%% latex: = 4
+% 
+% Lalu mencari standart deviasinya
+% 
+% -Deviasi
+%% latex: (2-4)^{2} = 4
+%% latex: (4-4)^{2} = 0
+%% latex: (6-4)^{2} = 4
+% 
+% -Variasi
+%% latex: variasi = \frac{4+0+4}{3}
+%% latex: = 2.6
+% 
+% -Standart deviasi
+%% latex: standar deviasi= \sqrt{2.6}
+%% latex: = 1.632
+%% dibulatkan
+%% latex: = 2
+> 
+>d=random(100)
+>filename="aura.dat";
+>d
+>mean(d), dev(d), median(d)
+>
+% Fungsi writematrix() atau writetable() dapat dikonfigurasi untuk
+% bahasa lain.
+% 
+% Misalnya, jika Anda memiliki sistem Indonesia (titik desimal dengan
+% koma), Excel Anda memerlukan nilai dengan koma desimal yang dipisahkan
+% oleh titik koma dalam file csv (defaultnya adalah nilai yang
+% dipisahkan koma). File "test.csv" berikut akan muncul di folder
+% cuurent Anda.
+>filename="text.csv"; ...
+>writematrix(random(5,3),file=filename,separator=",");
+% Anda sekarang dapat membuka file ini dengan Excel Indonesia secara
+% langsung.
+>fileremove(filename);
+% Terkadang kita memiliki string dengan token seperti berikut ini.
+>s1:="f m m f m m m f f f m m f"; ...
+>s2:="f f f m m f f";
+% Untuk tokenize ini, kami mendefinisikan vektor token.
+>tok:=["f","m"]
+% Kemudian kita dapat menghitung berapa kali setiap token muncul dalam
+% string, dan memasukkan hasilnya ke dalam tabel.
+> M:=getmultiplicities(tok,strtokens(s1))_ ...
+>getmultiplicities(tok,strtokens(s2));
+% Tulis tabel dengan header token.
+>writetable(M,labc=tok,labr=1:2,wc=6)
+>
+% Untuk statistika, EMT dapat membaca dan menulis tabel.
+>file="test.dat"; open(file,"w"); ...
+>writeln("A,B,C"); writematrix(random(3,3)); ...
+>close();
+% Filenya akan terlihat seperti ini.
+>printfile(file)
+% Fungsi readtable() dalam bentuknya yang paling sederhana dapat membaca
+% ini dan mengembalikan kumpulan nilai dan baris judul.
+>L=readtable(file,>list);
+% Koleksi ini dapat dicetak dengan writetable() ke notebook, atau ke
+% file.
+>writetable(L,wc=10 ,dc=5)
+% Matriks nilai adalah elemen pertama dari L. Perhatikan bahwa mean()
+% dalam EMT menghitung nilai rata-rata dari baris matriks.
+>mean(L[1])
+% * File CSV
+% 
+% Pertama, mari kita menulis matriks ke dalam file. Untuk output, kami
+% membuat file di direktori kerja saat ini.
+>file="test.csv"; ...
+>M=random(4,4); writematrix(M,file);
+% Berikut adalah isi dari file ini.
+>printfile(file)
+% CVS ini dapat dibuka pada sistem bahasa Inggris ke Excel dengan klik
+% dua kali. Jika Anda mendapatkan file seperti itu di sistem Jerman,
+% Anda perlu mengimpor data ke Excel dengan memperhatikan titik desimal.
+% 
+% Tetapi titik desimal juga merupakan format default untuk EMT. Anda
+% dapat membaca matriks dari file dengan readmatrix().
+>readmatrix(file)
+% Dimungkinkan untuk menulis beberapa matriks ke satu file. Perintah
+% open() dapat membuka file untuk ditulis dengan parameter "w".
+% Standarnya adalah "r" untuk membaca.
+>open(file,"w"); writematrix(M); writematrix(M'); close();
+% Matriks dipisahkan oleh garis kosong. Untuk membaca matriks, buka file
+%% dan panggil readmatrix() beberapa kali.
+>open(file); A=readmatrix(); B=readmatrix(); A==B, close();
+% Di Excel atau spreadsheet serupa, Anda dapat mengekspor matriks
+% sebagai CSV (nilai yang dipisahkan koma). Di Excel 2007, gunakan
+% "simpan sebagai" dan "format lain", lalu pilih "CSV". Pastikan, tabel
+% saat ini hanya berisi data yang ingin Anda ekspor.
+% 
+% Berikut adalah contoh.
+>printfile("excel-data.csv")
+% Seperti yang Anda lihat, sistem Jerman saya menggunakan titik koma
+% sebagai pemisah dan koma desimal. Anda dapat mengubah ini di
+% pengaturan sistem atau di Excel, tetapi tidak perlu membaca matriks ke
+% dalam EMT.
+% 
+% Cara termudah untuk membaca ini ke dalam Euler adalah readmatrix().
+% Semua koma diganti dengan titik dengan parameter >comma. Untuk CSV
+% bahasa Inggris, cukup abaikan parameter ini.
+>M=readmatrix("excel-data.csv",>comma)
+% Mari kita plot ini.
+>plot2d(M'[1],M'[2:3],>points,color=[red,green]'):
+>
+% Ada cara yang lebih mendasar untuk membaca data dari file. Anda dapat
+% membuka file dan membaca angka baris demi baris. Fungsi
+% getvectorline() akan membaca angka dari baris data. Secara default, ia
+% mengharapkan titik desimal. Tapi itu juga bisa menggunakan koma
+% desimal, jika Anda memanggil setdecimaldot(",") sebelum Anda
+% menggunakan fungsi ini.
+% 
+% Fungsi berikut adalah contoh untuk ini. Ini akan berhenti di akhir
+% file atau baris kosong.
+>function myload (file) ...
+$open(file);
+$M=[];
+$repeat
+$   until eof();
+$   v=getvectorline(3);
+$   if length(v)>0 then M=M_v; else break; endif;
+$end;
+$return M;
+$close(file);
+$endfunction
+>myload(file)
+% Dimungkinkan juga untuk membaca semua angka dalam file itu dengan
+% getvector().
+> open(file); v=getvector(10000); close(); redim(v[1:9],3,3)
+% Jadi sangat mudah untuk menyimpan vektor nilai, satu nilai di setiap
+% baris dan membaca kembali vektor ini.
+>v=random(1000); mean(v)
+>writematrix(v',file); mean(readmatrix(file)')
+% Contoh lain
+%% Disini saya menggunakan file csv yang lain yaitu mtcars
+>fileku="mtcars.csv"; ...
+>N=random(3,3); writematrix(N,fileku);
+>printfile(fileku)
+>readmatrix(fileku)
+>
+>mean(N[1])
+>
+% * Berlatih Membaca dan Menulis File
+% 
+% Menggunakan file yang disediakan dibesmart
+>filename="table.dat";
+>printfile(filename)
+% 2. 
+>filename="table1.dat";
+>printfile(filename,6)
+>
+% 3.
+>fileku="GOOG.csv";
+>printfile(fileku)
+>L=readtable(fileku)
+% 4
+>filename="sample.csv";
+>printfile(filename)
+>tok:=["female","read"]
+>filename="mtcars.csv"; ...
+>a = random(3,3), writematrix(a, filename);
+>mean(a[1])
+>a=random(3,3)
+% * Sub Topik 4 : Membaca dari Web
+% 
+% Situs web atau file dengan URL dapat dibuka di EMT dan dapat dibaca
+% baris demi baris.
+% 
+% Dalam contoh, kami membaca versi saat ini dari situs EMT. Kami
+% menggunakan ekspresi reguler untuk memindai "Versi ..." dalam sebuah
+% judul.
+>function readversion() ...
+$urlopen("http://www.euler-math-toolbox.de/Programs/Changes.html");
+$repeat
+$  until urleof();
+$  s=urlgetline();
+$  k=strfind(s,"Version ",1);
+$  if k>0 then substring(s,k,strfind(s,"<",k)-1), break; endif;
+$end;
+$urlclose();
+$endfunction
+>readversion 
+% ----
+%% ---
+%% Nama : Amalia Intan Arvitasari
+%% Kelas: Matematika B
+%% NIM  : 22305144026
+% 
+% ** Sub Topik 5 : Perhitungan Analisis Data Statistika Deskriptif
+% 
+% Pada sub topik 5 part 1 ini akan dibahas mengenai:
+%% 1. Penjelasan umum mengenai statistika deskriptif
+%% 2. Ruang lingkup kajian pada analisis statistika deskriptif yang
+% meliputi distribusi frekuensi, mean, median, dan modus.
+% 
+% ** Penjelasan Umum Mengenai statistika Deskriptif
+% 
+% Statistika deskriptif yaitu statistik yang mempelajari tata cara
+% mengumpulkan, menyusun, menyajikan, dan menganalisis data yang
+% berwujud angka agar dapat memberikan gambaran yang teratur, ringkas,
+% dan jelas mengenai suatu gejala atau keadaan peristiwa. Analisis ini
+% hanya berupa akumulasi data dasar dalam bentuk deskripsi semata dalam
+% arti tidak mencari atau menerangkan saling hubungan, menguji
+% hipotesis, membuat ramalan atau melakukan penarikan kesimpulan.
+% Analisis data yang tergolong statistik deskriptif terdiri dari
+% distribusi frekuensi, ukuran pemusatan data(mean,median,modus), ukuran
+% letak(kuartil,desil,persentil), ukuran dispersi(jangkauan atau
+% rentang,varians,simpangan baku), dan teknis statistik lain yang
+% bertujuan hanya untuk mengetahui gambaran atau kecenderungan data
+% tanpa bermaksud melakukan generalisasi.
+% 
+% ** Distribusi Frekuensi
+% 
+% Distribusi frekuensi merupakan ruang lingkup kajian pada analisis
+% statistik deskriptif. Distribusi frekuensi adalah alat penyajian data
+% berbentuk kolom dan lajur (tabel)yang di dalamnya dibuat angka yang
+% menggambarkan pancaran frekuensi dari variabel yang sedang menjadi
+% objek. Unsur-unsur distribusi frekuensi yaitu kelas(kelompok nilai
+% data yang ditulis dalam bentuk interval),batas bawah(jangkauan
+% terendah dari kelas),batas atas(jangkauan tertinggi dari kelas),tepi
+% bawah kelas(batas bawah dikurangi ketelitian data),tepi atas
+% kelas(batas atas kelas ditambah ketelitian data),banyak kelas(1+3,3
+% log n),dan panjang kelas.
+%% Dalam statistik terdapat berbagai macam distribusi frekuensi,
+% diantaranya:
+%% 1. Distribusi frekuensi biasa
+%%    Distribusi frekuensi biasa adalah distribusi
+%%    frekuensi yang berisikan jumlah frekuensi
+%%    dari setiap kelompok data atau kelas.
+%% 2. Distribusi frekuensi relatif
+%%    Distribusi frekuensi relatif adalah
+%%    distribusi frekuensi yang dinyatakan dalam
+%%    bentuk persentase atau desimal. Besarnya
+%%    frekuensi relatif yaitu frekuensi absolut
+%%    setiap kelas dibagi total frekuensi dikali
+%%    100%.
+%% 3. Distribusi frekuensi kumulatif
+%%    Menunjukkan seberapa besar jumlah frekuensi
+%%    pada tingkat kelas tertentu yang diperoleh
+%%    dengan menjumlahkan atau mengurangkan
+%%    frekuensi pada kelas tertentu dengan
+%%    frekuensi kelas sebelumnya. Distribusi
+%%    frekuensi kumulatif terdiri dari 2 macam
+%%    yaitu distribusi kumulatif kurang dari dan
+%%    distribusi kumulatif lebih dari.
+% 
+% Contoh Soal 1:
+%% 1.Disajikan data urut yaitu
+% 45,48,49,50,52,52,52,53,53,54,54,54,54,54,56,56,
+% 56,56,57,57,58,58,58,58,58,58,58,59,59,60,60,60,
+% 62,62,62,63,63,64,64,65,67,68,69,70,70,71,73,74.
+%% Buatlah distribusi frekuensi berdasarkan data diatas!
+%% Penyeleaian:
+%%          - Menentukan range
+%%            range= nilai maks-nilai min
+%%                 = 74-45
+%%                 = 29
+%%          - Menentukan banyak kelas dengan aturan
+%%            struges.
+%%            = 1+3,3 log n, n banyaknya data
+%%            = 1+3,3 log 48
+%%            = 6,64
+%%            = 7
+%%          - Menentukan panjang kelas
+%% latex: p=\frac {range}{banyak kelas}
+%% latex: p=\frac {29}{7}
+%% latex: p= 4.14=5
+% 
+% Berdasarkan pertimbangan beberapa unsur dalam data urut diatas yaitu
+% nilai minimum 45, nilai maksimum 74, banyak kelas yaitu 7, dan panjang
+% kelas yaitu 5 maka dapat dibuat tabel distribusi frekuensi dengan
+% batas bawah kelas pertama yaitu 43 dan batas atas kelas ketujuh yaitu
+% 77. Sehingga dapat ditentukan tepi bawah kelas pertama yaitu
+% 43-0.5=42.5 dan tepi atas kelas ketujuh yaitu 77+0.5=77.5.
+>r=42.5:5:77.5; v=[1,6,13,15,6,5,2];
+>T:=r[1:7]' | r[2:8]' | v'; writetable(T,labc=["TB","TA","Frek"])
+% Mencari Titik Tengah
+>(T[,1]+T[,2])/2 // the midpoint of each interval 
+% Sajian dalam bentuk histogram
+>plot2d(r,v,a=40,b=80,c=0,d=20,bar=1,style="\/"):
+>
+% ** Rata-Rata Hitung(Mean)
+% 
+% Rata-Rata hitung biasa juga disebut sebagai rerata atau mean merupakan
+% ruang lingkup kajian pada analisis statistika deskriptif yang termasuk
+% dalam ukuran pemusatan data.
+%% latex: \mbox{ Rata-Rata hitung ini disimbolkan dengan } {\mu} \mbox{ untuk data populasi } dan
+%% latex: \bar {X} \mbox{ untuk data sampel }.
+%% Rata-rata hitung atau mean merupakan nilai yang menunjukkan pusat dari
+% nilai data dan dapat mewakili keterpusatan data. Mean dapat diperoleh
+% dengan membagi jumlah nilai-nilai data dengan jumlah individu(cacah
+% data). Perhitungan mean dibagi dua yaitu mean data tunggal dan mean
+% data kelompok.
+% 
+% ** 1. Perhitungan mean pada data tunggal
+% 
+% Pada data tunggal, perhitungannya yaitu dengan cara menjumlahkan semua
+% nilai dan dibagi banyak data. Rumus yang digunakan adalah sebagai
+% berikut:
+%% latex: \bar{X} = \frac{\sum x_i}{n}
+%% latex: \mu = \frac{\sum x_i}{N}
+%% Keterangan:
+%% latex: \bar {X}=\mbox{ Rata-Rata hitung atau mean untuk data sampel}
+%% latex: \mu=\mbox{ Rata-Rata hitung atau mean untuk data populasi }
+%% latex: \sum x_i=\mbox{ jumlah dari nilai data ke-i }
+%%            n = banyaknya data dalam sampel
+%%            N - banyaknya data dalam populasi
+% 
+% Data tunggal juga dapat disajikan dalam tabel distribusi.
+%% Misalnya diberikan data
+%% latex: x_1,x_2,...,x_n
+%% yang memiliki frekuensi berturut-turut
+%% latex: f_1,f_2,...,f_n
+%% maka rataan hitung sampel atau rataan hitung populasi dari data yang
+% disajikan dalam daftar distribusi itu ditentukan dengan rumus:
+% 
+% Untuk rata-rata hitung sampel,
+% 
+% latex: \bar{x}=\frac{\sum_{i=1}^{n} f_i x_i}{\sum_{i=1}^{n} f_i}
+% 
+% Untuk rata-rata hitung populasi,
+% 
+% latex: \mu=\frac{\sum_{i=1}^{n} f_i x_i}{\sum_{i=1}^{n} f_i}
+% 
+% 
+% Kita dapat mengetahui nilai rata-rata hitung(mean)pada data tunggal
+% dengan menggunakan perintah EMT yaitu 'mean(x)' dan 'mean(x,f)'.
+% 
+% Contoh Soal 1:
+%% 1. Seorang pelatih tembak ingin mengevaluasi nilai ketangkasan delapan
+% anak buahnya jenis senapan yang dipakai M-16 dengan jarak 300 meter
+% dan masing-masing mendapat nilai 76,85,70,65,40,70,50,dan 80.
+% Berapakah rata-rata nilai ketangkasan delapan anak tersebut?
+%% Penyelesain:
+>x=[76,85,70,65,40,70,50,80]; mean(x),
+% Diketahui:
+%% latex: \sum x_i={76+85+70+65+40+70+80}=536
+%%                  n = 8
+%% latex: \bar{X} = \frac{\sum x_i}{n}
+%% latex: \bar{X} = \frac{536}{8}
+%% latex: \bar{X} = 67
+%% Sehingga rata-rata nilai ketangkasan delapan anak tersebut adalah 67
+% 
+% Contoh Soal 2:
+%% Banyaknya pegawai di 5 apotik adalah 3,5,6,4,dan 6. Dengan memandang
+% data itu sebagai data populasi, hitunglah nilai rata-rata banyaknya
+% pegawai di 5 apotik tersebut!
+%% Penyelesaian:
+>x=[3,5,6,4,6]; mean(x),
+% Diketahui:
+%% latex: \sum x_i={3+5+6+4+6}=24
+%%                         N = 5
+%% latex: \mu = \frac{\sum x_i}{N}
+%% latex: \mu = \frac{24}{5}
+%% latex: \mu = 4.8
+%% Sehingga nilai rata-rata banyaknya pegawai di 5 apotik tersebut adalah
+% 4.8
+% 
+% Contoh Soal 3:
+%% Diberikan data berat kambing di suatu peternakan yang memelihara 50
+% kambing. kambing dengan berat 45kg terdapat 5 ekor, kambing dengan
+% berat 46kg terdapat 10 ekor, kambing dengan berat 47kg terdapat 6
+% ekor, kambing dengan berat 48kg terdapat 9 ekor, kambing dengan berat
+% 49kg terdapat 7 ekor, dan kambing dengan berat 50kg terdapat 13 ekor.
+% Tentukan rata-rata berat kambing di peternakan tersebut.
+%% Penyelesaian:
+>x=[45,46,47,48,49,50], f=[5,10,6,9,7,13] //Mendeskripsikan data dan frekuensi
+>mean(x,f)    //Menghitung rata-rata
+% Jadi, rata-rata berat kambing di peternakan tersebut adalah 47.84 kg
+>
+% ** 2. Perhitungan mean pada data kelompok
+% 
+% Jika data yang sudah dikelompokkan dalam hitungan distribusi frekuensi
+% maka data tersebut akan berbaur sehingga keaslian data itu akan hilang
+% bercampur dengan data lain menurut kelasnya, hanya dalam perhitungan
+% mean pada data kelompok diambil titik tengahnya untuk mewakili setiap
+% kelas interval. Adapun rumus yang digunakan untuk menghitung mean pada
+% data kelompok yaitu:
+%% latex: \bar{X} = \frac{\sum t_i f_i}{\sum f_i}
+%%    Keterangan:
+%% latex:   \sum t_i f_i = \mbox{jumlah dari perkalian antara titik tengah tiap kelas dan frekuensi tiap kelas}
+%% latex: \sum f_i = \mbox{jumlah dari frekuensi tiap kelas}
+% 
+% Kita dapat mengetahui nilai rata-rata hitung(mean) pada data kelompok
+% dengan menggunakan perintah EMT yaitu 'mean(t,v)'dimana t menunjukkan
+% titik tengah dan v menunjukkan frekuensi.
+% 
+% Misalkan suatu data berkelompok terdiri dari n kelas dengan nilai
+% tengah masing-masing kelas secara berturut-turut adalah
+%% latex: t_1,t_2,...,t_n
+%% dan masing-masing frekuensinya adalah
+%% latex: f_1,f_2,...,f_n
+%% maka untuk menghitung rata-rata data tabel distribusi seperti ini di
+% EMT, dapat dilakukan dengan cara berikut:
+%% 1. Menentukan tepi bawah kelas (Tb), panjang kelas (P), dan tepi atas
+% kelas (Ta) dengan rumus :
+% 
+% latex: T_b=a-0,5
+%% latex: P=(b-a)+1
+%% latex: P=\frac{range}{banyak kelas}
+%% latex: T_a=b+0.5
+% 
+% dengan a = batas bawah kelas dan b = batas atas kelas
+% 
+% 2. Mendeskripsikan data dalam bentuk tabel, dengan perintah
+% 
+% > r=tepi bawah terkecil:panjang kelas:tepi atas terbesar;
+% v=[frekuensi];
+%% > T:=r[1:jumlah kelas]' | r[2:jumlah kelas + 1]' | v';
+% writetable(T,labc=["tepi bawah","tepi atas","frekuensi"])
+% 
+% 3. Menghitung nilai tengah kelas, dengan perintah
+% 
+% > (T[,1]+T[,2])/2
+% 
+% 4. Mengubah baris menjadi kolom
+% 
+% > t=fold(r,[0.5,0.5])
+% 
+% 5. Menghitung rata-rata, dengan perintah
+% 
+% > mean(t,v)
+% 
+% Contoh Soal:
+%% 1. Data berikut menunjukkan nilai yang diperoleh 50 siswa SMP 1 Playen
+% pada Ujian Nasional mata pelajaran matematika.
+%% Siswa yang mendapat nilai dalam rentang 61-65 sebanyak 2 orang, dalam
+% rentang 66-70 sebanyak 5 orang, dalam rentang 71-75 sebanyak 8 orang,
+% dalam rentang 76-80 sebanyak 10 orang, dalam rentang 81-85 sebanyak 12
+% orang, dalam rentang 86-90 sebanyak 9 orang, dan dalam rentang 91-95
+% sebanyak 4 orang.
+%% Tentukan rata-rata nilai yang diperoleh 50 siswa tersebut!
+%% Penyelesaian:
+%% Menentukan tepi bawah kelas yang terkecil
+>61-0.5
+% Menentukan panjang kelas
+>(65-61)+1
+% Menentukan tepi atas kelas yang terbesar
+>95+0.5
+>r=60.5:5:95.5; v=[2,5,8,10,12,9,4];
+>T:=r[1:7]' | r[2:8]' | v'; writetable(T,labc=["TB","TA","Frek"])
+% Menentukan Titik Tengah
+>(T[,1]+T[,2])/2 // the midpoint of each interval
+>t=fold(r,[0.5,0.5])
+% Menentukan mean(rata-rata)
+>mean(t,v)
+% Diketahui:
+%% latex: \sum t_i f_i=(2)(63)+(5)(68)+(8)(73)+(10)(78)+(12)(83)+(9)(88)+(4)(93)=3.990
+%% latex: \sum f_i=2+5+8+10+12+9+4=50
+%% latex: \bar{X} = \frac{\sum t_i f_i}{\sum f_i}
+%% latex: \bar{X} = \frac{3.990}{50}
+%% latex: \bar{X} = 79,8
+% 
+% Jadi rata-rata nilai yang diperoleh 50 siswa tersebut adalah 79,8
+% 
+% ** 3. Perhitungan Rata-Rata dari file yang tersimpan dalam direktori
+% 
+% Dalam perhitungan rata-rata hitung(mean), kita dapat menggunakan file
+% yang tersimpan dalam direktori.
+% 
+% Contoh 1:
+%% Misalnya kita akan menghitung nilai rata-rata(mean) yang terdapat
+% dalam file "test.dat"
+>filename="test.dat"; ...
+>V=random(3,3); writematrix(V,filename);
+>printfile(filename),
+>readmatrix(filename)
+>mean(V),
+% 
+% 
+% Contoh 2:
+%% Misalnya akan dihitung nilai rata-rata dari file 'mtcars.csv'
+>filename="mtcars.csv";  ...
+>V=random(4,4); writematrix(V,filename);
+>printfile(filename)
+>readmatrix(filename)
+>mean(V[1])
+>mean(V[2])
+>mean(V[3])
+>mean(V[4])
+>mean(V)
+>
+% ** Median
+% 
+% Median merupakah ruang lingkup kajian pada analisis statistika
+% deskriptif yang termasuk dalam ukuran pemusatan data. Median adalah
+% suatu nilai yang berada di tengah data setelah diurutkan dari data
+% yang terkecil sampai yang terbesar atau sebaliknya. Dalam perhitungan
+% statistik, median dibagi menjadi 2 bagian yaitu median untuk data
+% tunggal dan median untuk data kelompok.
+% 
+% ** 1. Median data tunggal
+% 
+% Jika jumlah suatu data(n) berjumlah ganjil maka nilai mediannya adalah
+% sama dengan data yang memiliki nilai di urutan paling tengah yang
+% memiliki nomor urut k, dimana untuk menentukan nilai k dapat dihitung
+% menggunakan rumus:
+%% latex: k = \frac{n+1}{2}
+%% Jika jumlah suatu data(n) berjumlah genap,maka untuk menghitung
+% mediannya dengan menggunakan rumus:
+%% latex: k = \frac{n}{2}
+%% latex: Me = \frac{1}{2}({X_k+X_{k+1})}
+%% Kita dapat mengetahui nilai median pada data tunggal dengan
+% menggunakan perintah EMT yaitu 'median(data)'
+% 
+% Contoh Soal 1:
+%% Diketahui sebuah data hasil nilai Ujian Akhir Semester mata kuliah
+% Filsafat Ilmu 11 mahasiswa sebagai berikut:
+% 85,90,80,95,50,75,30,60,65,40,70.
+%% Tentukan nilai median dari data tersebut!
+%% Penyelesaian:
+>data=[85,90,80,95,50,75,30,60,65,40,70];
+>urut=sort(data)
+% Dalam menentukan median, langkah pertama yang harus dilakukan adalah
+% dengan mengurutkan data tersebut dari yang terkecil sampai yang
+% terbesar dengan fungsi sort(data). Fungsi sort(data) dalam EMT
+% digunakan untuk mengurutkan elemen-elemen dalam suatu vektor atau
+% matriks(dari nilai terkecil ke nilai terbesar).
+>median(data)
+% Diketahui bahwa kasus ini merupakan data yang berjumlah ganjil,
+% sehingga nilai median untuk kasus ini adalah sama dengan data yang
+% memiliki nilai di urutan paling tengah yang memiliki nomor urut k.
+%% latex: k = \frac{n+1}{2}
+%% latex: k = \frac{11+1}{2}
+%% latex: k = 6
+%% latex: Me = X_6 = 70
+% 
+% Jadi nilai median dari data hasil Ujian Akhir Semester(UAS) mata
+% kuliah Filsafat Ilmu 11 mahasiswa adalah 70
+% 
+% Contoh Soal 2:
+%% Data upah dari 8 karyawan yang dinyatakan dalam rupiah adalah sebagai
+% berikut:
+%% 20,80,75,60,50,85,45,90.
+%% Tentukan nilai median dari data tersebut!
+%% Penyelesaian:
+>data=[20,80,75,60,50,85,45,90];
+>urut=sort(data)
+>median(data)
+% Diketahui bahwa kasus ini merupakan data yang berjumlah genap,
+% sehingga nilai median untuk kasus ini adalah terletak pada data ke-k
+% dan data ke-(k+1).
+%% latex: k = \frac{n}{2}
+%% latex: k = \frac{8}{2}
+%% latex: k = 4
+% 
+% latex: Me = \frac{1}{2}({X_k+X_{k+1})}
+%% latex: Me = \frac{1}{2}({X_4+X_{5})}
+%% latex: Me = \frac{1}{2}({60+75})
+%% latex: Me = 67.5
+% 
+% Jadi nilai median pada data upah 8 karyawan adalah 67.5
+>
+% ** 2. Median data kelompok
+% 
+% Untuk menghitung median pada data kelompok, dapat menggunakan rumus di
+% bawah ini:
+%% latex: Me = Tb+\frac{\frac {1}{2}{n}-f_{ks}}{f_m}.{p}
+%%    Keterangan:
+%%       Tb = Tepi bawah kelas median
+%%        n = Total frekuensi
+%%      fks = Frekuensi kumulatif sebelum median
+%%       fm = frekuensi median
+%%        p = panjang kelas
+% 
+% Untuk menghitung median data berkelompok di EMT, dapat dilakukan
+% dengan cara berikut:
+%% 1. Menentukan tepi bawah kelas (Tb), panjang kelas (P), dan tepi atas
+% kelas (Ta) dengan rumus :
+% 
+% latex: T_b=a-0,5
+%% latex: P=(b-a)+1
+%% latex: T_a=b+0.5
+% 
+% dengan a = batas bawah kelas dan b = batas atas kelas
+% 
+% 2. Mendeskripsikan data dalam bentuk tabel, dengan perintah
+% 
+% > r=tepi bawah terkecil:panjang kelas:tepi atas terbesar;
+% v=[frekuensi];
+%% > T:=r[1:jumlah kelas]' | r[2:jumlah kelas + 1]' | v';
+% writetable(T,labc=["tepi bawah","tepi atas","frekuensi"]))
+% 
+% 3. Mendeskripsikan tepi bawah kelas median, panjang kelas median,
+% banyak data,frekuensi kumulatif sebelum median, frekuensi kelas median
+% 
+% > Tb=(tepi bawah kelas median), p=(panjang kelas median), n=(Total
+% frekuensi), Fks=(frekuensi kumulatif sebelum median), fm=(frekuensi
+% kelas median)
+% 
+% 4. Menghitung median data dengan perintah:
+% 
+% > Tb+p*(1/2*n-Fks)/fm
+% 
+% Contoh Soal:
+%% 1. Berikut adalah data hasil dari pengukuran berat badan 50 siswa SD
+% Negeri Tambakrejo. Dari ke 50 siswa, mayoritas siswa memiliki berat
+% badan yang ideal. Siswa yang mempunyai berat badan dalam rentang 21-26
+% kg sebanyak 5 orang, yang mempunyai berat badan dalam rentang 27-32 kg
+% sebanyak 10 orang, yang mempunyai berat badan dalam rentang 33-38 kg
+% sebanyak 12 orang, yang mempunyai berat badan dalam rentang 39-44 kg
+% sebanyak 14 orang, yang mempunyai berat badan dalam rentang 45-50 kg
+% sebanyak 7 orang, dan yang mempunyai berat badan 51-56 kg sebanyak 2
+% orang. Tentukan median dari data hasil pengukuran berat badan 50 siswa
+% di SD tersebut!
+%% Penyelesaian:
+%% Menentukan tepi bawah kelas yang terkecil
+>21-0.5
+% Menentukan panjang kelas
+>(26-21)+1
+% Menentukan tepi atas kelas yang terbesar
+>56+0.5
+>r=20.5:6:56.5; v=[5,10,12,14,7,2];
+>T:=r[1:6]' | r[2:7]' | v'; writetable(T,labc=["TB","TA","frek"])
+% Berdasarkan data, median berada pada urutan ke 25, maka median berada
+% pada kelas 32.5-38.5.
+>Tb=32.5, p=6, n=50, Fks=15, fm=12
+>Tb+p*(1/2*n-Fks)/fm
+% 
+% Diketahui bahwa median berada di data ke 25
+%% latex: Me = Tb+\frac{\frac {1}{2}{n}-f_{ks}}{f_m}.{p}
+%% latex: Me = 32.5+\frac{\frac{1}{2}({50})-15}{12}.{6}
+%% latex: Me = 32.5+5
+%% latex: Me = 37.5
+% 
+% Jadi median dari data hasil pengukuran berat badan 50 siswa SD
+% Tambakrejo adalah 37.5
+>
+% ** Modus
+% 
+% Modus merupakan ruang lingkup kajian pada analisis statistika
+% deskriptif yang termasuk dalam ukuran pemusatan data. Modus adalah
+% nilai yang sering muncul diantara sebaran data atau nilai yang
+% memiliki frekuensi tertinggi dalam distribusi data. Modus terdiri dari
+% 2 jenis yaitu modus untuk data tunggal dan modus untuk data kelompok.
+% 
+% 1. Modus data tunggal
+%%    Cara menentukan modus untuk data tunggal
+%%    terbilang cukup mudah yaitu dengan
+%%    mengurutkan data dari yang terkecil ke yang
+%%    terbesar sehingga data-data yang memiliki
+%%    nilai yang sama akan berdekatan satu sama
+%%    lain, lalu mencari frekuensi dari masing-
+%%    masing data dan pilih data dengan frekuensi
+%%    tertinggi.
+%% 2. Modus data kelompok
+%%    Jika data telah dikelompokkan, maka telah
+%%    disajikan dalam bentuk distribusi frekuensi.
+%%    Berikut rumus untuk mencari modus data
+%%    kelompok:
+%% latex: Mo = Tb+\frac{d_1}{d_1+d_2}.{c}
+%%    Keterangan:
+%%      Tb = Tepi bawah
+%%      d1 = selisih f modus dengan f sebelumnya
+%%      d2 = selisih f modus dengan f sesudahnya
+%%       c = panjang kelas
+% 
+% Untuk menghitung modus data berkelompok di EMT, dapat dilakukan dengan
+% cara berikut:
+%% 1. Menentukan tepi bawah kelas (Tb), panjang kelas (P), dan tepi atas
+% kelas (Ta) dengan rumus :
+% 
+% latex: T_b=a-0,5
+%% latex: P=(b-a)+1
+%% latex: T_a=b+0.5
+% 
+% dengan a = batas bawah kelas dan b = batas atas kelas
+% 
+% 2. Mendeskripsikan data dalam bentuk tabel, dengan perintah
+% 
+% > r=tepi bawah terkecil:panjang kelas:tepi atas terbesar;
+% v=[frekuensi];
+%% > T:=r[1:jumlah kelas]' | r[2:jumlah kelas + 1]' | v';
+% writetable(T,labc=["tepi bawah","tepi atas","frekuensi"]))
+% 
+% 3. Mendeskripsikan tepi bawah kelas modus, panjang kelas modus,selisih
+% frekuensi modus dengan frekuensi sebelumnya, selisih frekuensi modus
+% dengan frekuensi sesudahnya
+% 
+% > Tb=(tepi bawah kelas modus), p=(panjang kelas modus), d1=(selisih
+% frekuensi modus dengan frekunsi sebelumnya), d2=(selisih frekuensi
+% modus dengan frekuensi sesudahnya)
+% 
+% 4. Menghitung modus dengan perintah:
+% 
+% > Tb+p*d1/(d1+d2)
+% 
+% Contoh Soal:
+%% 1. Berikut adalah data hasil dari pengukuran berat badan 30 siswa SD
+% Negeri Tambakrejo. Dari ke 30 siswa, mayoritas siswa memiliki berat
+% badan yang ideal. Siswa yang mempunyai berat badan dalam rentang 21-25
+% kg sebanyak 2 orang, yang mempunyai berat badan dalam rentang 26-30 kg
+% sebanyak 8 orang, yang mempunyai berat badan dalam rentang 31-35 kg
+% sebanyak 9 orang, yang mempunyai berat badan dalam rentang 36-40 kg
+% sebanyak 6 orang, yang mempunyai berat badan dalam rentang 41-45 kg
+% sebanyak 3 orang, dan yang mempunyai berat badan 46-50 kg sebanyak 2
+% orang. Tentukan modus dari data hasil pengukuran berat badan 30 siswa
+% di SD tersebut!
+%% Penyelesaian:
+%% Menentukan tepi bawah kelas yang terkecil
+>21-0.5
+% Menentukan panjang kelas
+>(25-21)+1
+% Menentukan tepi atas yang terbesar
+>50+0.5
+>r=20.5:5:50.5; v=[2,8,9,6,3,2];
+>T:=r[1:6]' | r[2:7]' | v'; writetable(T,labc=["TB","TA","frek"])
+% Berdasarkan data, modus berada pada kelas 30.5-35.5.
+>Tb=30.5, p=5, d1=1, d2=3
+>Tb+p*d1/(d1+d2)
+% Jadi modus dari data hasil pengukuran berat badan 30 siswa di SD
+% Tambakrejo adalah 31.75
+>
+% ----
+%% ---
+%% Nama : Assyifa Cahya Marselita
+%% Kelas: Matematika B
+%% NIM  : 22305141001
+% 
+% * Sub Topik 5.2 : Perhitungan Analisis Data Statistika Deskriptif
+% 
+% Pada sub topik 5 bagian 2 ini akan dibahas mengenai:
+%% 1. Penjelasan umum mengenai statistika deskriptif
+%% 2. Ruang lingkup kajian pada analisis statistika deskriptif yang
+% meliputi ukuran letak (kuartil, desil, dan persentil) dan ukuran
+% penyebaran (jangkauan, simpangan baku, dan varians)
+% 
+% ** Analisis Data Statistika Deskriptif
+% 
+%    Menurut Sudjana (2000) statistika adalah pengetahuan yang
+% berhubungan dengan cara-cara pengumpulan data, pengolahan atau
+% penganalisaannya dan penarikan kesimpulan berdasarkan kumpulan data
+% dan penganalisaan yang dilakukan. Tujuan dari statistika adalah untuk
+% menyajikan data secara ringkas dan mudah dimengerti, sehingga dapat
+% membuat kesimpulan dari suatu populasi dari data yang diambil.
+% Statistika dibagi menjadi statistika deskriptif dan inferensial.
+%%    Statistika deskriptif merupakakan cabang statistika yang fokus pada
+% pengumpulan, penyajian, dan menganalisa yang berwujud angka-angka agar
+% data tersebut dapat ditampilkan secara ringkas dan informatif. Dalam
+% statistika terdapat empat jenis statistika deskriptif yaitu,
+% distribusi frekuensi, ukuran pemusatan, ukuran letak, dan ukuran
+% penyebaran.
+%%    Distribusi frekuensi adalah merangkum data dalam bentuk tabel atau
+% grafik, yang menunjukkan seberapa sering setiap nilai muncul dalam
+% suatu himpunan data. Ukuran pemusatan terdiri dari mean (rata-rata),
+% median (nilai tengah), dan modus (nilai yang sering muncul). Ukuran
+% letak terdiri dari kuartil (membagi data menjadi empat bagian yang
+% sama besar), desil (membagi data menjadi 10 bagian sama besar), dan
+% persentil (membagi data menjadi 100 bagian sama besar). Ukuran
+% penyebaran terdiri dari jangkauan (nilai maksimum dan minimum dalam
+% suatu set data), varians (mengukur sejauh mana nilai tersebut menyebar
+% dari rata-ratanya), simpangan baku (akar kuadrat dari varians, yang
+% memberikan gambaran tentang seberapa dekat nilai-nilai dalam suatu set
+% data terhadap rata-ratanya.)
+%%    Dari penjelasan singkat tentang data statistika deskriptif maka
+% pada sub bab ini, saya akan membahas analisis data statistika
+% deskriptif dengan jenis ukuran letak dan ukuran penyebaran.
+>
+% ** Ukuran Letak
+% 
+% Kita singgung kembali. Ukuran letak disini terdiri dari kuartil
+% (membagi data menjadi empat bagian yang sama besar), desil (membagi
+% data menjadi 10 bagian sama besar), dan persentil (membagi data
+% menjadi 100 bagian sama besar).
+% 
+% * Kuartil
+% 
+% Kuartil merupakan penggambaran pembagian data menjadi empat bagian
+% yang sama besar. Kuartil membagi data menjadi tiga titik tertentu,
+% yang dikenal sebagai kuartil pertama (Q1), kuartil kedua (Q2), dan
+% kuartil ketiga (Q3). Rumus yang digunakan dalam menentukan posisi
+% Q1,Q2,dan Q3 dengan
+% 
+% latex: Q_i=i\frac{n+1} {4}
+% 
+% 
+% dimana i adalah indeks kuartil dan n adalah jumlah total data
+% 
+% Dalam EMT fungsi yang dapat digunakan untuk menentukan kuartil adalah
+% 'quartiles()'.
+>data=[93,80,52,41,60,77,55,71,79,81,64,83,32,95,75,54,90,80,95];
+% Diketahui sebuah data dari hasil nilai ujian akhir dari siswa
+>urut=sort(data)
+% Dalam menentukan kuartil langkah pertama yang dapat dilakukan dengan
+% mengurutkan data tersebut dengan fungsi sort(data). Fungsi sort(data)
+% dalam Euler Math Toolbox digunakan untuk mengurutkan elemen-elemen
+% dalam suatu vektor atau matriks (dari nilai terkecil ke nilai
+% terbesar).
+>quartiles(data)
+% Dalam output hitung yang dihasilkan dari 'quartiles(data)' dapat
+% diketahui bahwa nilai Q1(kuartil bawah) = 55 , Q2(kuartil
+% tengah(median)) = 77, dan Q3(kuartil atas)= 83. Lalu untuk nilai
+% paling kanan dan paling kiri merupakan minimum dan maximum dari suatu
+% data yang diketahui.
+% 
+% Dengan cara rumus kuartil yang diketahui dapat dihitung nilai kuartil
+% atas, tengah, dan bawah. Dengan cara...
+>data=[93,80,52,41,60,77,55,71,79,81,64,83,32,95,75,54,90,80,95];
+>urut=sort(data)
+>a=length(data)
+% Setelah mengurutkan data tersebut, selanjutnya hitung banyaknya data
+% tersebut dengan menggunakan fungsi 'length()'. Fungsi tersebut
+% berfungsi untuk mengetahui banyaknya elemen dalam suatu vektor atau
+% matriks.
+>Q1=((a+1)/4)
+% Hasil Q1 menunjukkan 5 yang berarti letak kuartil ke-1 ada di data
+% nomer 5 yaitu 55.
+>Q2=((a+1)/2)
+% Hasil Q2 menunjukkan 10 yang berarti letak kuartil ke-2 ada di data
+% nomer 10 yaitu 77.
+>Q3=60/4
+% Hasil Q3 menunjukkan 15 yang berarti letak kuartil ke-3 ada di data
+% nomer 15 yaitu 83.
+% 
+% Dari beberapa percobaan tersebut dapat diketahui bahwa dengan cara
+% rumus kuartil ataupun menggunakan fungsi 'quartiles()' tersebut akan
+% sama.
+>
+% ** Desil dan Persentil
+% 
+% Desil merupakan pembagian data ke dalam sepuluh kelompok sebanding
+% yang disusun berdasarkan urutan nilainya. Desil ke-1 (D1) adalah nilai
+% terendah, desil ke-2 (D2) adalah nilai yang membagi data menjadi 10%
+% terendah, desil ke-3 (D3) membagi data menjadi 20% terendah, dan
+% seterusnya. Rumus dari desil adalah
+% 
+% latex: D_i=x_i\frac{(n+1)} {10}
+% 
+% Sedangkan persentil suatu nilai atau titik data yang membagi
+% distribusi data menjadi persentase tertentu atau menjadi 100 bagian
+% yang sama besar. Rumus dari persentil adalah
+% 
+% latex: P_i=x_i\frac{(n+1)} {100}
+% 
+% Dalam EMT fungsi yang digunakan anatata desil dan persentil sama yaitu
+% 'quantile()'. Perbedaan penggunaannya terletak pada nilai yang akan
+% dibaginya.
+>data=[93,80,52,41,60,77,55,71,79,81,64,83,32,95,75,54,90,80,95,55];
+>urut=sort(data)
+>quantile(urut,0.1)
+% Dari hasil tersebut dapat diketahui bahwa nilai desil ke-1 dan
+% persentil ke-10 adalah 50,9
+>quantile(urut,0.2)
+>quantile(urut,0.5)
+>quantile(urut,0.7)
+% Dari dua percobaan tersebut diketahui nilai persentil ke-20 dan
+% persentil ke-50 adalah 54,8 dan 76. Hasil tersebut sama dengan hasil
+% desil ke-2 dan desil ke-5.
+% 
+% Karena desil ke-8 (D8) adalah nilai yang membagi data menjadi 80% di
+% bawahnya dan 20% di atasnya. Sedangkan persentil 80% (P80) juga
+% merujuk pada nilai yang membagi data menjadi 80% di bawahnya dan 20%
+% di atasnya.
+>
+% ** Ukuran Penyebaran
+% 
+% Kita singgung kembali. Ukuran penyebaran disini terdiri dari jangkauan
+% yang terdiri dari nilai maksimum dan minimum, varians (mengukur sejauh
+% mana nilai tersebut menyebar dari rata-ratanya), simpangan baku(akar
+% kuadrat dari varians yang memberikan gambaran tentang seberapa dekat
+% nilai-nilai dalam suatu set data terhadap rata-ratanya).
+% 
+% ** Jangkauan
+% 
+% Jangkauan (range) adalah salah satu ukuran penyebaran yang paling
+% sederhana dalam statistika. Jangkauan dapat dihitung dengan mengambil
+% selisih antara nilai maksimum dan minimum dalam suatu set data.
+% 
+% Untuk menemukan jangkauan data tunggal di EMT dapat menggunakan
+% perintah berikut:
+%% > x=[data]; max(x)-min(x)
+>data=[65,55,70,85,90,75,80,75];
+>a=max(data)
+>b=min(data)
+% Permisalan dengan a = max(data) dan b = min(data) memudahkan untuk
+% menghitung nilai jangkauan.
+>jangkauan = a-b
+% Dalam menentukan nilai jangkauan antara nilai maximum dan minimum
+% dapat dilakukan dengan cara menentukan nilai maximum dan minimum dari
+% data tersebut, lalu kurangi antara hasil dari nilai maximum dan
+% minimum tersebut.
+% 
+% Untuk data berkelompok dapat menggunakan rumus;
+%% > max(transpose(T[,2]))-min(transpose(T[,1]))
+% 
+% Dimisalkan diketahui sebuah tabel distribusi frekuensi
+>r=39.5:5:69.5; v=[5,18,42,20,9,6];
+>T:=r[1:6]' |r[2:7]'| v'; writetable(T,labc=["TB","TA","Frek"])
+>max(transpose(T[,2]))-min(transpose(T[,1]))
+% Jadi dapat diketahui bahwa jangkauan dari tabel tersebut adalah 30
+% orang.
+>
+% ** Varians
+% 
+% Varians adalah nilai statistik yang sering kali dipakai dalam
+% menentukan kedekatan sebaran data yang ada di dalam sampel dan
+% seberapa dekat titik data individu dengan mean atau rata-rata nilai
+% dari sampel itu sendiri.
+% 
+% Pada EMT, dalam menentukan suatu varians dapat menggunakan fungsi
+% 'dev()^2'. Fungsi dev disini merupakan kepanjangan dari deviations
+% yang berarti suatu verktor atau array yang berisi deviasi dari setiap
+% nilai dalam data.
+% 
+% latex: {dev} = x_i - \bar{x}
+>data=[65,55,70,85,90,75,80,75];
+>urut=sort(data)
+>a = mean(urut)
+% Langkah pertama dalam menentukan varians adalah menentukan mean
+% (rata-rata) dari suatu data tersebut.
+>dev = urut-a
+% Setelah menentukan rata-rata, selanjutnya menentukan deviations dari
+% nilai data tersebut dikurangi dengan mean
+>varians = mean(dev^2)
+% Lalu diperoleh nilai varians 108.984375 dengan langkah mean(dev^2)
+>
+% Varians juga dapat menentukan data kelompok. Dengan menggunakan fungsi
+% 'mean()' dan 'sum(). Sum disini digunakan untuk menjumlahkan data
+% tersebut.
+>r=499.5:100:1099.5; v=[4,6,12,15,10,3];
+>T:=r[1:6]' | r[2:7]' | v'; writetable(T,labc=["tepi bawah","tepi atas","frekuensi"])
+>(T[,1]+T[,2])/2; t=fold(r,[0.5,0.5])
+% Mencari titik tengah antar interval tersebut dan mencari nilai mean
+% dari data tersebut.
+>m = mean(t,v)
+% Menghitung rata-rata dari data tersebut.
+>sum(v*(t-m)^2)/(sum(v)-1)
+% Melalui rumus tersebut maka dapat dihasilkan nilai varians dari data
+% table tersebut dengan nilai 17551,0204082.
+>
+% ** Simpangan Baku
+% 
+% Simpangan baku atau deviasi standar adalah ukuran seberapa jauh
+% nilai-nilai dalam satu set data tersebar dari nilai rata-ratanya. Ini
+% memberikan gambaran tentang sejauh mana nilai-nilai dalam data
+% "berkumpul" atau "menyebar" di sekitar rata-ratanya.
+% 
+% latex: \sigma=\sqrt{varians}
+% 
+% Pada sub bab sebelumnya telah dijelaskan bagaimana cara mencari nilai
+% suatu varians. Mengulang kembali varians menggunakan fungsi
+% 
+% latex: mean*dev()^2
+% 
+% sedangkan simpangan baku menggunakan
+% 
+% latex: \sigma=\sqrt{mean*dev()^2}
+>data=[65,55,70,85,90,75,80,75];
+>urut=sort(data)
+>a = mean(urut)
+>dev = urut-a
+>varians = mean(dev^2)
+% Langkah dalam menentukan simpangan baku sama dengan cara menentukan
+% varians dari sebuah data tersebut. Dari hasil mean, dev, dan hasil
+% varians maka dapat diketahui nilai simpangan baku tersebut.
+>simpanganBaku = sqrt(varians)
+% Nilai simpangan baku dari data tersebut adalah 10.4395581803
+>
+% Tidak hanya data tunggal saja, dalam menentukan simpangan baku dapat
+% dilakukan juga apabila data tersebut berkelompok.
+>r=499.5:100:1099.5; v=[4,6,12,15,10,3];
+>T:=r[1:6]' | r[2:7]' | v'; writetable(T,labc=["tepi bawah","tepi atas","frekuensi"])
+>(T[,1]+T[,2])/2; t=fold(r,[0.5,0.5])
+>m=mean(t,v)
+>sqrt(sum(v*(t-m)^2)/(sum(v)-1))
+% Cara tersebut juga sama seperti cara menentukan varians yang sudah
+% dijelaskan sebelumnya. Hanya saja perbedaan disini ditambah kata
+% 'sqrt' yang berarti akar, sesuai dengan rumus simpangan baku tersebut.
+>
+% ----
+%% ---
+%% Nama : Ardi Budi Setiawan
+%% Kelas: Matematika-B
+%% NIM  : 22305141017
+% 
+% * Sub Topik 6.1 : Menggambar Grafik Statistika
+% 
+% Diagram adalah suatu representasi simbolis informasi dalam bentuk
+% geometri 2 dimensi sesuai teknik visualisasi. Kadang teknik yang
+% dipakai memanfaatkan visualisasi tiga dimensi yang kemudian
+% diproyeksikan ke permukaan dua dimensi. Kata grafik dan bagan biasa
+% dipakai sebagai sinonim kata diagram.
+% 
+% Grafik juga diartikan sebagai suatu kombinasi angka, huruf, simbol,
+% gambar, lambang, perkataandan lukisan yang disajikan dalam suatu media
+% untuk menggambarkan informasi dari data.
+% 
+% Diagram dapat digunakan untuk alasan yang berbeda, seperti untuk
+% menunjukkan bagian dari keseluruhan, langkah-langkah dari suatu
+% proses, dan hubungan. Sebuah bantuan grafis akan menampilkan informasi
+% secara visual sehingga pembaca dapat lebih memahami dan mengingat
+% ide-ide.
+% 
+% Jenis-Jenis Diagram ataupun kurva pada EMT:
+%% - Diagram kotak,
+%% - Diagram batang,
+%% - Diagram lingkaran,
+%% - Diagram bintang,
+%% - Diagram impuls,
+%% - Histogram,
+%% - Kurva fungsi kerapatan probabilitas,
+%% - Kurva fungsi distribusi kumulatif,
+%% - Diagram titik,
+%% - Diagram garis,
+%% - Kurva regresi.
+>
+% * Diagram Kotak
+% 
+% Dalam statistika deskriptif, diagram kotak garis atau boxplot adalah
+% metode grafis untuk menggambarkan kumpulan data numerik berdasarkan
+% nilai kuartilnya. Diagram kotak garis bersifat nonparametrik, artinya
+% diagram ini menampilkan variasi sampel populasi statistik tanpa
+% membuat asumsi apa pun tentang distribusi statistik yang mendasarinya.
+% Jarak antara bagian-bagian kotak yang berbeda menunjukkan derajat
+% dispersi (sebaran), kemiringan, dan pencilan dari data tersebut.
+% 
+% Boxplot merupakan ringkasan distribusi sampel yang disajikan secara
+% grafis yang bisa menggambarkan bentuk distribusi data (skewness),
+% ukuran tendensi sentral dan ukuran penyebaran (keragaman) data
+% pengamatan.
+%% Terdapat 5 ukuran statistik yang bisa kita baca dari boxplot, yaitu:
+%%   - nilai minimum: nilai observasi terkecil
+%%   - Q1: kuartil terendah atau kuartil pertama
+%%   - Q2: median atau nilai pertengahan
+%%   - Q3: kuartil tertinggi atau kuartil ketiga
+%%   - nilai maksimum: nilai observasi terbesar.
+%%   - Selain itu, boxplot juga dapat menunjukkan ada tidaknya nilai
+% outlierdan nilai ekstrim dari data pengamatan.
+% 
+% 
+% ** Contoh penggunaan diagram kotak di EMT
+%% Misalkan ada sebuah data M sebagai berikut:
+%% Maka, akan divisualisasikan data M dengan diagram kotak
+>
+>M=[1000,1004,998,997,1002,1001,998,1004,998,997]; ...
+>mean(M), dev(M),
+% latex: mean= \frac{sum(data)}{len(data)}
+%% Jumlah data dibagi banyak data.
+% 
+% Sedangkan dev() merupakan standart deviasi nya.
+%% Rumusnya:
+%% latex: deviasi= [(x-mean)^{2}for x in data]
+%% latex: variasi= \frac{sum(deviasi)}{len(data)}
+%% latex: standart deviasi= \sqrt{variasi}
+% 
+% Pertama-tama data M akan diurut berdasarkan nilainya, dari terendah
+% hingga tertinggi(terbesar).
+%% latex: M=[997,997,998,998,998,1000,1001,1002,1004,1004]
+%% Mencari Median:
+%% Median=kuartil tengah(Q3)
+%% Median terletak pada data ke-
+%% latex: Median=\frac{1}{2}.(datake- (\frac{n}{2}) + datake- (\frac{n}{2}) +1)
+%% Dikarenakan data berjumlah genapa maka, digunakan rumus seperti itu.
+%% latex: = \frac{1}{2}.(datake- (\frac{10}{2}) + datake- (\frac{10}{2}) +1)
+%% latex: = \frac{1}{2}.(datake- (5) + datake- (5) +1)
+%% latex: = \frac{1}{2}.(998 + 1000)
+%% latex: = 999
+%% Ditemukan median-nya adalah 999
+% 
+% Mencari Kuartil atas dan bawah
+%% latex: Q1=datake- \frac{1}{4}. n
+%% latex: =datake-\frac{1}{4}.10
+%% latex: =998
+% 
+% latex: Q3=datake- \frac{3}{4}. n
+%% latex: =datake-\frac{3}{4}.10
+%% latex: =1002
+>
+>boxplot(M, outliers=1.5):
+% Plot diatas merupakan diagram kotak, Kotak yang berwarna hijau
+% tersebut merupakan hasil dari perintah EMT yang diberikan dimana kotak
+% tersebut dibatasi dengan Kuartil terendah dan kuartil tertinggi, dan
+% terdapat garis hitam di dalam kotak merupakan Median atau nilai
+% tengah.
+>
+% image: BoxPlot.png
+% 
+% Di bawah ini diperlihatkan rincian detail boxplot beserta cara
+% penentuan batas-batasnya.
+% 
+%  # Bagian utama boxplot adalah kotak berbentuk persegi (Box) yang
+% merupakan bidang yang menyajikan interquartile range (IQR), dimana 50
+% % dari nilai data pengamatan terletak di sana.
+%%     - Panjang kotak sesuai dengan jangkauan kuartil dalam (inner
+% Quartile Range, IQR) yang merupakan selisih antara Kuartil ketiga (Q3)
+% dengan Kuartil pertama (Q1). IQR menggambarkan ukuran penyebaran data.
+% Semakin panjang bidang IQR menunjukkan data semakin menyebar. Pada
+% Gambar, IQR = UQ – LQ = Q3 – Q1
+%%     - Garis bawah kotak (LQ) = Q1 (Kuartil pertama), dimana 25% data
+% pengamatan lebih kecil atau sama dengan nilai Q1
+%%     - Garis tengah kotak = Q2 (median), dimana 50% data pengamatan
+% lebih kecil atau sama dengan nilai ini
+%%     - Garis atas kotak (UQ) = Q3 (Kuartil ketiga) dimana 75% data
+% pengamatan lebih kecil atau sama dengan nilai Q1
+% 
+%  # Garis yang merupakan perpanjangan dari box(baik ke arah atas
+% ataupun ke arah bawah) dinamakan dengan whiskers.
+%%     - Whiskers bawah menunjukkan nilai yang lebih rendah dari kumpulan
+% data yang berada dalam IQR
+%%     - Whiskers atas menunjukkan nilai yang lebih tinggi dari kumpulan
+% data yang berada dalam IQR
+%%     - Panjang whisker = 1.5 x IQR. Masing-masing garis whisker dimulai
+% dari ujung kotak IQR, dan berakhir pada nilai data yang bukan
+% dikategorikan sebagai outlier (Pada gambar, batasnya adalah garis UIF
+% dan LIF). Dengan demikian, nilai terbesar dan terkecil dari data
+% pengamatan (tanpa termasuk outlier) masih merupakan bagian dari
+% Boxplot yang terletak tepat di ujung garis tepi whiskers.
+% 
+%  # Nilai yang berada di atas atau dibawah whiskerdinamakan nilai
+% outlier atau ekstrim.
+%%     - Nilai outlieradalah nilai data yang letaknya lebih dari 1.5 x
+% panjang kotak (IQR), diukur dari UQ (atas kotak) atau LQ (bawah
+% kotak). Pada Gambar di atas, ada 2 data pengamatan yang merupakan
+% outlier, yaitu data pada case 33 dan case 55 (ada pada baris ke 33 dan
+% baris 35)
+%%        => Q3 + (1.5 x IQR) < outlier atas = Q3 + (3 x IQR)
+%%        => Q1 – (1.5 x IQR) > outlier bawah = Q1 – (3 x IQR)
+%%      - Nilai ekstrimadalah nilai-nilai yang letaknya lebih dari 3 x
+% panjang kotak (IQR), diukur dari UQ (atas kotak) atau LQ (bawah
+% kotak). Pada gambar di atas, ada 1 data yang merupakan nilai ekstem,
+% yaitu data pada case 15.
+%%        => Ekstrim bagian atas apabila nilainya berada di atas Q3 + (3
+% x IQR) dan
+%%        =>Ekstrim bagian bawah apabila nilainya lebih rendah dari Q1 –
+% (3 x IQR)
+% 
+% 
+% Berikut penggunaan boxplot pada distribusi normal:
+>boxplot(M, lab=none, style="0#", textcolor=red, outliers=1.5, pointstyle="o", range=none):
+>x=normal(1000)*10+1000; boxplot(x, lab=none, style="/", textcolor=red, outliers=1.5, pointstyle="=",range=none):
+% Penjelasan:
+%%   - "lab" disini digunakan untuk melabelkan atau menamai kotak
+%%   - "style" disini digunakan untuk mengatur style atau gaya yang
+% digunakan pada kotak, bisa menggunakan 0, =, +, /, |
+%%   - "textcolor' digunakan untuk mewarnai text pada "lab"
+%%   - "outliers" Parameter outliers dalam konteks boxplot menentukan
+% apakah dan bagaimana outlier (nilai-nilai ekstrem yang jauh dari
+% kebanyakan nilai) ditampilkan dalam boxplot. Dalam beberapa fungsi
+% pembuat boxplot, parameter ini digunakan untuk mengontrol penampilan
+% dan penanganan.
+%%   - "pointstyle" digunakan untuk mengatur style atau gaya pada
+% point-point yang ada
+%%   - "range" digunakan untuk mengatur jarak
+>x=randnormal(5,1000,100,10); boxplot(x,outliers=none):
+% Boxplots dapat membantu kita dalam memahami karakteristik dari
+% distribusi data. Selain untuk melihat derajat penyebaran data (yang
+% dapat dilihat dari tinggi/panjang boxplot) juga dapat digunakan untuk
+% menilai kesimetrisan sebaran data. Panjang kotak menggambarkan tingkat
+% penyebaran atau keragaman data pengamatan, sedangkan letak median dan
+% panjang whisker menggambarkan tingkat kesimetrisannya.
+>
+% * Diagram Batang
+% 
+%  Diagram batang merupakan jenis grafik yang digunakan untuk
+% menunjukkan dan membandingkan kuantitas data dalam kategori yang
+% berbeda. Diagram batang umumnya digunakan untuk menggambarkan
+% perkembangan nilai suatu objek penelitian dalam kurun waktu tertentu.
+% Diagram batang menunjukkan keterangan-keterangan dengan batang-batang
+% tegak atau mendatar dan sama lebar dengan batang-batang terpisah
+% 
+%  Diagram batang memiliki kelebihan, yaitu diagram batang merupakan
+% diagram paling sederhana dan paling umum digunakan. Namun diagram
+% batang juga memiliki kekurangan, yaitu diagram batang hanya disajikan
+% data yang telah dikelompokkan atas atribut dan kategori. Dan Diagram
+% batang tidak dapat menampilkan datum dari tiap orang atau benda yang
+% dicatat(sebut saja data individual).
+% 
+% ** contoh penggunaan diagram batang di EMT
+% 
+% Untuk membuat suatu diagram atau plot kita memerlukan sebuah data yang
+% nantinya akan diolah. Data yang kita gunakan merupakan hasil pemilu
+% Jerman sejak tahun 1990, diukur dalam kursi.
+>BW := [ ...
+>1990,662,319,239,79,8,17; ...
+>1994,672,294,252,47,49,30; ...
+>1998,669,245,298,43,47,36; ...
+>2002,603,248,251,47,55,2; ...
+>2005,614,226,222,61,51,54; ...
+>2009,622,239,146,93,68,76; ...
+>2013,631,311,193,0,63,64];
+% Untuk P disini dimasukkan sebagai nama-nama partai pada data
+% sebelumnya.
+>P:=["CDU/CSU","SPD","FDP","Gr","Li"];
+% Kolom pertama = Tahun Terjadinya Pemilu
+%% Kolom kedua = jumlah kursi keseluruahan pada tahun tertentu
+%% kolom ketiga sampai ketujuh = jumlah kursi tiap partai
+>BT:=BW[,3:7]; BT:=BT/sum(BT); YT:=BW[,1]';
+% Fungsi BW[,3:7] disini mengartikan bahwa fungsi bw akan dipakai pada
+% kolom 3 sampai 7
+>writetable(BT*100,wc=6,dc=0,>fixed,labc=P,labr=YT)
+% Memmbaca dari data sebelumnya yang merupakan matriks menjadi sebuah
+% tabel yang tiap kolom nya sudah dinamai.
+>CP:=[rgb(0.5,0.5,0.5),red,yellow,green,rgb(0.8,0,0)];
+% Fungsi CP disini digunakan nantinya untuk membuat perbedaan warna pada
+% setiap batang yang menyesuaikan nama partai
+>columnsplot(BW[6,3:7],P,color=CP):
+% Berikut merupakan diagram batang, hasil dari memplot data sebelumnya.
+% Ini merupakan diagram batang dalam 2 dimensi.
+>
+>columnsplot3d(BT,scols=P,srows=YT, ...
+>  angle=30°,ccols=CP): 
+% 
+% Ini adalah perintah untuk membuat diagram batang(kolom) dalam 3
+% Dimensi . Plot ini akan menggunakan data dari BT, dengan kolom-kolom
+% yang dipilih pada data BW, yaitu nama-nama partai (scols=p). Selain
+% itu, parameter angle=30° mengatur sudut pandang plot dalam ruang 3D,
+% ccols=CP mungkin mengatur warna kolom.
+>
+% * Diagram Lingkaran
+% 
+%  Diagram lingkaran merupakan suatu diagram yang difungsikan untuk
+% menyajikan data dalam bentuk lingkaran baik menggunakan data absolut
+% maupun relatif. Untuk membuat diagram lingkaran pertama-tama kita
+% harus membuat lingkaran terlebih dahulu lalu dibagi-bagi menjadi
+% beberapa sektor. Tiap sektor melukiskan kategori data yang terlebih
+% dahulu diubah kedalam derajat.
+% 
+%  Kelebihan diagram lingkaran, yaitu Tempat untuk membuat diagram
+% lingkaran tidak terlalu besar. Dan Diagram lingkaran sangat berguna
+% untuk menunjukkan dan membandingkan proporsi dari data. Namun diagram
+% lingkaran juga memiliki Kekurangan, yaitu  Diagram lingkaran tidak
+% dapat menunjukkan frekuensinya.
+% 
+% ** contoh penggunaan diagram lingkaran di EMT
+% 
+% Data yang dipakai Masih menggunakan data sebelumnya, yaitu data pemilu
+% jerman dari tahun.
+>i=[1,2,3,4,5]; piechart(BW[6,3:7][i], style="O#", color=CP[i],lab=P[i], textcolor=blue, r=1.5):
+% "i" digunakan untuk iterasi kolom, atau mengurutkan kolom sesuai
+% potongan pada diagram lingkaran
+%% "textcolor" digunakan untuk mewarnai text
+%% "color" digunakan untuk mewarnai potongan lingkaran
+%% "style" digunakan untuk mengatur gradasi style atau gaya pada diagram
+% lingkaran
+%% "lab" digunakan untuk melabelkan atau menamai setiap potongan
+% lingkaran
+%% "r" digunakan untuk mengatur radius pada diagram lingkaran
+>i=[1,5,3,2,4]; piechart(BW[6,3:7][i], style="/", color=CP[i],lab=P[i], textcolor=green, r=2.5):
+>
+% * Diagram Bintang
+% 
+%   Diagram bintang adalah jenis diagram yang terdiri dari titik-titik
+% yang terhubung oleh garis-garis sehingga membentuk pola seperti
+% bintang.Grafik ini memiliki serangkaian garis yang menjulur dari titik
+% pusat, menyerupai bentuk bintang. Setiap lengan dari bintang mewakili
+% dimensi atau variabel yang berbeda, dan panjang garis atau area yang
+% diisi dapat mencerminkan nilai atau kontribusi relatif dari setiap
+% dimensi.
+% 
+%   Diagram ini sering digunakan dalam matematika, statistik, dan ilmu
+% komputer untuk memvisualisasikan hubungan antara titik-titik atau
+% entitas dalam sebuah sistem. Diagram bintang dapat memiliki berbagai
+% bentuk dan ukuran tergantung pada jumlah titik yang digunakan.
+% 
+%   Diagram bintang paling sederhana adalah diagram bintang dengan lima
+% titik yang membentuk pola bintang lima sudut. Namun, diagram bintang
+% juga dapat memiliki lebih banyak titik dan membentuk pola yang lebih
+% kompleks. Diagram bintang dapat digunakan untuk berbagai tujuan,
+% seperti memvisualisasikan hubungan antara entitas dalam jaringan
+% sosial, menggambarkan hubungan antara variabel dalam analisis
+% multivariat, atau menggambarkan struktur hierarki dalam organisasi.
+% 
+% ** Contoh penggunaan diagram bintang di EMT
+% 
+% Misalkan ada sebuah data V:
+>v = [4, 5, 3, 7, 6];
+% Selanjutnya akan di ilustrasikan data V kebentuk diagram bintang,
+% sebagai berikut:
+>starplot(v, style="+", color=blue, lab=1:5, rays=10, pstyle="=+", textcolor=black, r=1.5):
+% Penjelasan:
+%%   - "lab" disini digunakan untuk melabelkan atau menamai kotak
+%%   - "style" disini digunakan untuk mengatur style atau gaya yang
+% digunakan pada garis bintang.
+%%   - "textcolor" digunakan untuk mewarnai text pada "lab".
+%%   - "rays" digunakan untuk menunjukkan jumlah "rays" atau "spokes"
+% pada radar plot.
+%%   - "pstyle" digunakan untuk mengatur style atau gaya pada point-point
+% yang ada.
+%%   - "r" digunakan untuk mengatur radius.
+% 
+% 
+%   #Contoh penggunaan diagram bintang pada distribusi normal statistika
+>starplot(normal(1,10)+4,lab=1:10,>rays):
+>
+%   #Contoh soal lainnya
+%% Misalkan ada sebuah data nilai matematika dari latihan UTBK di suatu
+% tempat les. Data tersebut berisikan 5 orang siswa dengan nilai 87
+% untuk siswa pertama, 72 untuk siswa kedua, 66 untuk siswa ketiga, 92
+% untuk siswa keempat, dan 58 untuk siswa kelima. Ilustrasikan data
+% tersebut dengan diagram bintang!
+>A=[87,72,66,92,58]
+>starplot(A,lab=1:5,>rays):
+% 
+%   #Contoh soal lainnya
+% 
+%   PT SukaMaju memiliki tim penjualan yang terdiri dari lima anggota.
+% Perusahaan tersebut ingin mengevaluasi kinerja masing-masing anggota
+% tim berdasarkan Penjualan tiap bulan. Berikut adalah data evaluasi
+% kinerja untuk setiap anggota tim pada bulan september:
+% 
+%   - Johan: Penjualan (85)
+%%   - Maria: Penjualan (78)
+%%   - David: Penjualan (92)
+%%   - Lisa: Penjualan (85)
+%%   - Kevin: Penjualan (80)
+% 
+%   Akan diilustrasikan dengan diagram bintang, sebagi berikut:
+>Nama=["Johan","Maria","David","Lisa","Kevin"];
+>Penjualan=[85,78,92,85,80];
+>starplot(Penjualan, style="+", color=red, lab=Nama, rays=10, pstyle="=", textcolor=blue, r=1.5):
+>
+% * Diagram Impuls
+% 
+% Dalam statistik, istilah "grafik impuls" mungkin tidak umum digunakan.
+% Namun, jika Anda merujuk pada grafik distribusi fungsi massa
+% probabilitas diskrit, di mana probabilitas terkonsentrasi pada nilai
+% tertentu, maka histogram atau diagram batang mungkin sesuai dengan
+% konsep ini.
+% 
+% Sebagai contoh, jika Anda memiliki distribusi probabilitas diskrit
+% seperti distribusi Poisson atau distribusi binomial, Anda dapat
+% membuat grafik yang menunjukkan probabilitas pada setiap nilai yang
+% mungkin. Ini akan menunjukkan "puncak" pada nilai-nilai tertentu, yang
+% mungkin tampak mirip dengan bentuk grafik impuls.
+% 
+% Dalam Euler Math Toolbox, dalam membuat grafik statistik, termasuk
+% grafik impuls, kita dapat menggunakan fungsi perencanaan yang
+% dibangun. Berikut salah satu contoh bagaimana anda dapat membuat bagan
+% impuls untuk distribusi probabilitas diskrit.
+% 
+% ** Contoh penggunaan diagram impuls di EMT
+% 
+% Berikut adalah plot impuls dari sebuah data acak yang terdistribusi
+% secara merata didalam interval [0,1].
+>plot2d(makeimpulse(1:10,random(1,10)),>bar):
+>plot2d(makeimpulse(1:30,random(1,30)),>bar, style="\/"):
+>
+%   Jika data tersebut merupakan data yang terdistribusi secara
+% eksponensial, maka diperlukan plot logaritmik untuk membuat diagram
+% impuls nya. Distribusi eksponensial adalah jenis distribusi di mana
+% banyak data memiliki nilai yang kecil, tetapi ada beberapa data yang
+% memiliki nilai yang sangat besar.
+% 
+%   Pada sumbu logaritmik, perbedaan skala nilai yang besar dapat
+% diurutkan. Sehingga akan ada perbedaan kecil yang dapat dilihat lebih
+% jelas. Dikarenakan dapat terlihat perbedaan antara nilai-nilai yang
+% mendekati nol dan nilai yang lebih besar pada grafik logaritmik.
+% Berikut adalah penggunaan diagram impuls dengan fungsi logaritma.
+>logimpulseplot(1:10,-log(random(1,10))*10):
+%   #Contoh soal lainnya
+% 
+%   Sebuah koloni bakteri tumbuh secara eksponensial. Pada suatu
+% eksperimen, populasi bakteri diukur setiap jam selama 5 jam. Data
+% pertumbuhan populasi bakteri (dalam ribuan) adalah sebagai berikut:
+>Jam=[1:5];
+% Populasi ini diatur dalam ribuan
+>Populasi=[2,5,20,80,320];
+>logimpulseplot (Jam,log(Populasi), style="O#", color=blue, d=0.2):
+% Penjelasan:
+%%  - "Jam" disini digunakan sebagai data pada x bar
+%%  - "log(populasi)" disini digunakan untuk menglogaritmakan data yang
+% ada di populasi sebagai daya y bar dalam diagram
+%%  - "style" disini digunakan untuk mengatur style atau gaya yang
+% digunakan dalam kotak/batang.
+%%  - "color" disini digunakan untuk mengatur warna pada kotak/batang
+% diagram.
+%%  - "d' disini digunakan untuk mengatur ketebalan kotak/batang diagram.
+>
+% * Histogram
+% 
+% Histogram adalah representasi grafis untuk distribusi warna dari citra
+% digital. Sumbu ordinat vertikal merupakan representasi piksel dengan
+% nilai tonal dari tiap-tiap deret bin pada sumbu axis horizontalnya.
+% Sumbu axis terdiri dari deret logaritmik bin densitometry yang
+% membentuk rentang luminasi atau exposure range yang mendekati respon
+% spectral sensitivity visual mata manusia. Deret bin pada density yang
+% terpadat mempunyai interval yang relatif sangat linear dengan variabel
+% mid-tone terletak tepat di tengahnya.
+% 
+% ** Contoh penggunaan Histogram di EMT
+% 
+% Berikut merupakan contoh histogram pada sebuah data yang terdistribusi
+% normal.
+>plot2d(histo(normal(1,15),v=-5:5,<bar)):
+>
+%   #Contoh soal lainnya
+% 
+%   Sebuah universitas melakukan penelitian untuk mengidentifikasi
+% distribusi waktu studi mahasiswa di suatu jurusan. Data waktu studi
+% (dalam tahun) dari 100 mahasiswa lulusan jurusan tersebut telah
+% dikumpulkan. Berikut adalah data tersebut:
+% 
+%   Data M:
+>M=[5,4,6,7,5,6,7,8,4,6, ...
+>5,6,7,5,6,5,7,6,8,6, ...
+>4,5,6,7,5,6,5,6,7,8, ...
+>6,7,5,6,7,5,6,7,8,6, ...
+>7,8,6,5,4,5,6,7,5,6];
+% Akan diplotkan histogram
+>plot2d(histo(M, v=-5:15, <bar,),color=red):
+% Penjelasan:
+%%   - "histo" disini digunakan unutk memanggil fungsi histogram yang ada
+% pada plot 2d di EMT.
+%%   - "M" disini merupakan data yang akan diplotkan.
+%%   - "v" disini disini digunakan untuk mengatur interval pada grafik
+% histogram yang diperlihatkan.
+%%   - "<bar" digunakan untuk membuat bar pada grafik.
+%%   - "color" disini digunakan untuk mengatur warna grafik
+>
+%   #Contoh soal lainnya
+% 
+%   Seorang pemilik toko buku ingin menganalisis pola penjualan harian
+% untuk memahami frekuensi pembelian buku oleh pelanggan. Data penjualan
+% harian selama 30 hari terakhir telah dikumpulkan, dan berikut adalah
+% jumlah buku yang terjual setiap hari:
+>T=[35, 28, 42, 18, 24, 35, 40, 22, 29, 33, ...
+>26, 38, 32, 19, 31, 25, 37, 29, 24, 27, ...
+>36, 20, 28, 33, 31, 26, 39, 30, 23, 34];
+>plot2d(histo(T, v=10:50, <bar),color=blue):
+% ----
+%% ---
+%% Nama : Sherlyta Icha Nadiastuty
+%% NIM : 22305141013
+%% Kelas : Matematika B
+% 
+% * Sub Topik 6.2 : Menggambar Grafik Statistika
+% 
+% * Diagram titik
+% 
+% Diagram titik atau disebut juga sebagai scatter plot, adalah jenis
+% diagram statistik yang menggunakan titik-titik untuk merepresentasikan
+% nilai dari dua variabel yang berbeda. Setiap titik dalam diagram
+% pencar mewakili satu pengamatan atau data dengan nilai-nilai yang
+% sesuai untuk kedua variabel tersebut.
+% 
+% Scatter plot sangat berguna untuk menemukan pola atau hubungan antara
+% dua variabel, serta untuk mengevaluasi distribusi data.
+% 
+% Dalam scatter plot, sumbu horizontal umumnya digunakan untuk variabel
+% independen (bebas), sedangkan sumbu vertikal digunakan untuk variabel
+% dependen (bergantung). Dengan mengamati pola penyebaran titik-titik,
+% kita mendapatkan wawasan tentang apakah ada korelasi antara dua
+% variabel dan jenis korelasi apa yang mungkin ada (positif, negatif,
+% atau tidak ada korelasi).
+% 
+% ** Berikut contoh menggambar diagram titik di EMT
+% 
+% Contoh 1
+%% Pada contoh ini, kita akan menggambar diagram titik dengan menggunakan
+% fungsi plot2d().
+>x=normal(1,100); 
+>plot2d(x,x+rotright(x),>points,style=".."):
+% Terdapat banyak style titik yang dapat kita dunakan, yaitu:
+%% "[]", "<>", ".", "..", "...","*", "+", "|", "-", "o",
+%% "[]#", "<>#", "o#" (bentuk terisi)
+%% "[]w", "<>w", "ow" (tidak transparan)
+% 
+% Selanjutnya, akan kita coba gambarkan diagram tersebut menggunakan
+% fungsi statplot(), pilih plottype="p" (karena kita akan menggambar
+% plot titik).
+>statplot(x,x+rotright(x),plottype="p",pstyle=".."):
+% Contoh 2
+%% Pada contoh ini, akan kita gambarkan diagram titik menggunakan fungsi
+% scatterplot().
+>{MS,hd}:=readtable("table1.dat",tok2:=["m","f"]);
+>writetable(MS,labc=hd,tok2:=["m","f"]);
+>scatterplots(tablecol(MS,3:5),hd[3:5]):
+% * Diagram Garis
+% 
+% Diagram garis adalah penyajian data yang digunakan untuk menggambarkan
+% suatu keadaan berupa data berkala atau berkelanjutan.
+% 
+% Selain itu, diagram ini juga bisa dikatakan berhubungan dengan kurun
+% waktu dan untuk menunjukkan perkembangan suatu keadaan.
+% 
+% Diagram ini sangat tepat untuk menyajikan data untuk mengetahui
+% kecenderungan kelakuan atau tren, seperti produksi minyak tiap tahun,
+% jumlah kelahiran tiap tahun, jumlah produksi tiap jam, dan lain-lain.
+% 
+% Dalam diagram garis, terdapat sumbu vertikal (sumbu y) untuk
+% menunjukkan frekuensi dan sumbu horizontal (sumbu x) untuk menunjukkan
+% variabel tertentu.
+% 
+% ** Berikut contoh menggambar diagram garis di EMT
+% 
+% Contoh 1
+%% Akan digambarkan diagram garis data banyaknya pelanggan di toko A
+% tahun 2015-2023.
+% 
+% Kita deskripsikan terlebih dahulu matriks x dan y,kemudian akan kita
+% buat tabel datanya.
+>x=[2015,2016,2017,2018,2019,2020,2021,2022,2023];
+>y=[600,500,900,1000,800,850,900,1000,1200];
+>writetable(x'|y',labc=["Tahun","Banyak Pelanggan"])
+% Selanjutnya, akan digambarkan diagram garis dengan menggunakan fungsi
+% statplot, dengan format:
+% 
+% statplot (x, y, plottype="l", lstyle="-", xl="", yl="", color=none,
+% vertical=0)
+% 
+% x : data untuk sumbu x
+%% y : data untuk sumbu y
+%% plotstyle : "l" (kita pilih style "l" karena berupa plot garis)
+%% lstyle : style garis
+%% xl : label sumbu x
+%% yl : label sumbu y
+%% color : warna garis
+%% vertikal : vertikal
+% 
+% Style garis:
+%% "-", "--", "-.", ".", ".-.", "-.-", "->"
+>statplot(x,y,plottype="l",lstyle="-",xl="Tahun",yl="Banyak Pelanggan",vertical=50):
+% Kita juga bisa menambahkan judul pada grafik dengan menggunakan fungsi
+% title().
+>title("Grafik Banyaknya Pelanggan Toko A Tahun 2015-2023"):
+% Menyajikan data dalam bentuk diagram dapat memudahkan pembaca untuk
+% memahami data yang disajikan.
+% 
+% Dari diagram garis diatas, dapat kita peroleh informasi bahwa:
+%% Banyaknya pelanggan di toko A tidak tetap (naik-turun)untuk setiap
+% tahunnya.
+%% Banyaknya pelanggan paling sedikit pada tahun 2016 yaitu sebanyak 500
+% pelanggan, sedangkan banyak pelanggan paling banyak pada tahun 2023
+% yaitu sebanyak 1200 pelanggan.
+% 
+% Selain menggunakan fungsi statplot, kita juga dapat menggambar diagram
+% garis menggunakan fungsi plot2d() seperti yang sudah pernah kita
+% pelajari sebelumnya, yaitu sebagai berikut.
+>plot2d(x,y,a=2015,b=2023,c=500,d=1500,style="-",xl="Tahun",yl="Banyak Pelanggan",vertical=50); ...
+>title("Grafik Banyak Pelanggan Toko A Tahun 2015-2023"):
+% a dan b : batas untuk sumbu x
+%% c dan d : batas untuk sumbu y
+%% style : gaya garis
+%% xl : label untuk sumbu x
+%% yl : label untuk sumbu y
+% 
+% Selain kita dapat menggambarkan diagram garis saja atau diagram titik
+% saja, kita juga dapat menggambarkan diagram keduanya.
+% 
+% Contoh 2
+%% Akan kita gambar diagram titik dan garis data hasil pemilu Jerman dari
+% tahun 1990 sampai 2013, diukur dalam kursi.
+>BW := [ ...
+>1990,662,319,239,79,8,17; ...
+>1994,672,294,252,47,49,30; ...
+>1998,669,245,298,43,47,36; ...
+>2002,603,248,251,47,55,2; ...
+>2005,614,226,222,61,51,54; ...
+>2009,622,239,146,93,68,76; ...
+>2013,631,311,193,0,63,64];
+>P:=["CDU/CSU","SPD","FDP","Gr","Li"]; 
+>BT:=BW[,3:7]; BT:=BT/sum(BT); YT:=BW[,1]';
+>writetable(BT*100,wc=6,dc=0,>fixed,labc=P,labr=YT)
+>BT1:=(BT.[1;1;0;0;0])'*100
+% Akan kita gambarkan plot statistik sederhana, yaitu plot titik dan
+% garis secara bersamaan dengan menggunakan fungsi statplot dan pilih
+% plottype="b".
+>statplot(YT,BT1,"b"):
+>CP:=[rgb(0.5,0.5,0.5),red,yellow,green,rgb(0.8,0,0)];
+% Untuk menggabungkan deretan data statistik dalam satu plot, dapat kita
+% digunakan fungsi dataplot().
+>J:=BW[,1]'; DP:=BW[,3:7]'; ...
+>dataplot(YT,BT',color=CP);  ...
+>labelbox(P,colors=CP,styles="[]",>points,w=0.2,x=0.3,y=0.4):
+% Contoh 3
+%% Akan digambarkan diagram titik dan garis dari data hasil panen padi
+% pada tahun 2016 sampai 2020.
+>T=[2016,2017,2018,2019,2020,2021]; P=[70,50,40,30,50,60];
+>writetable(T'|P',labc=["Tahun","Hasil Panen Padi (Ton)"])
+>statplot(T,P,"b",pstyle="o#",lstyle="-",xl="Tahun",yl="Hasil Panen Padi (Ton)",vertical=50);
+>title("Grafik Hasil Panen Padi Tahun 2016-2020"):
+% Kita juga menggambar diagram titik dan garis secara bersama dengan
+% menggunakan fungsi plot2d(), yaitu sebagai berikut.
+>plot2d(T,P,2016,2020); plot2d(T,P,>points,style="o#",>add); ...
+>title("Grafik Hasil Panen Padi Tahun 2016-2020"):
+% Dari grafik di atas, dapat dengan mudah kita ketahui bahwa panen padi
+% paling banyak yaitu pada tahun 2016 (70 ton) dan paling sedikit yaitu
+% pada tahun 2019 (30 ton).
+% 
+% * Kurva Regresi
+% 
+% Kurva regresi adalah representasi grafis dari model regresi yang
+% digunakan untuk memodelkan hubungan antara satu atau lebih variabel
+% independen (biasanya dilambangkan sebagai (X) dan variabel dependen
+% (Y). Kurva regresi ini mencoba untuk menunjukkan pola atau tren dalam
+% data dan memungkinkan kita untuk membuat prediksi atau estimasi
+% berdasarkan model tersebut.
+%% Secara umum, terdapat dua jenis kurva regresi yang umum digunakan
+% yaitu regresi linier dan regresi non-linier.
+% 
+% Regresi Linier adalah garis lurus yang digunakan untuk memodelkan
+% hubungan antara variabel independen (X) dan variabel dependen (Y).
+% 
+% Persamaan regresi linier umumnya ditulis sebagai
+%% latex: Y=mX+b
+%% di mana m adalah kemiringan (slope) dan b adalah perpotongan sumbu-y
+% (intercept).
+% 
+% Regresi linier dapat dilakukan dengan fungsi polyfit () atau berbagai
+% fungsi fit.
+% 
+% Sebagai permulaan kita menemukan garis regresi untuk data univariat
+% dengan polyfit(x, y, 1).
+% 
+% ** Berikut contoh menggambar kurva regresi di EMT
+% 
+% Contoh 1
+>x=1:10; y=[2,3,1,5,6,3,7,8,9,8]; writetable(x'|y',labc=["x","y"])
+>p=polyfit(x,y,1)
+>w &= "exp(-(x-10)^2/10)"; pw=polyfit(x,y,1,w=w(x))
+>figure(2,1); ...
+>figure(1); statplot(x,y,"p",xl="Regression"); ...
+>  plot2d("evalpoly(x,p)",>add,color=blue,style="--"); ...
+>  plot2d("evalpoly(x,pw)",5,10,>add,color=red,style="--"); ...
+>figure(2); plot2d(w,1,10,>filled,style="/",fillcolor=red,xl=w); ...
+>figure(0):
+% * Kurva Fungsi Kerapatan Probabilitas
+% 
+% Fungsi kerapatan/kepadatan probabilitas adalah fungsi yang memberikan
+% kemungkinan bahwa nilai suatu variabel acak akan berada di antara
+% rentang nilai tertentu.
+% 
+% Grafik fungsi kepadatan probabilitas berbentuk kurva lonceng. Area
+% yang terletak di antara dua nilai tertentu memberikan probabilitas
+% hasil observasi yang ditentukan.
+% 
+% ** Berikut contoh kurva fungsi kepadatan probabolitas.
+>plot2d("qnormal(x,1,1.5)",-4,6); ...
+>plot2d("qnormal(x,1,1.5)",a=2,b=5,>add,>filled):
+% Probabilitas variabel acak x yang terletak antara 2 dan 5 memenuhi
+%% P(2<X<5)= luas daerah hijau.
+% 
+% * Kurva Distribusi Kumulatif
+% 
+% Kurva distribusi kumulatif (CDF) adalah representasi kumulatif dari
+% fungsi distribusi probabilitas suatu variabel acak. CDF memberikan
+% probabilitas bahwa variabel acak tersebut kurang dari atau sama dengan
+% suatu nilai tertentu.
+% 
+% Seringkali, grafik CDF disajikan dalam bentuk kurva monotonik yang
+% terus meningkat, dan ini memberikan gambaran visual yang baik tentang
+% distribusi probabilitas variabel acak.
+% 
+% ** Berikut contoh menggambar kurva distribusi kumulatif di EMT
+% 
+% Contoh 1
+>plot2d("normaldis",-4,4): 
+% Dapat kita lihat dalam kurva CDF kontinu di atas dibagi menjadi 3
+% bagian, yaitu:
+%% 1. Bernilai 0 untuk x kurang dari batas bawah daerah rentang.
+%% 2. Merupakan fungsi monoton naik pada daerah rentang.
+%% 3. Bernilai konstan 1 untuk x lebih dari batas atas daerah rentangnya.
+% 
+% Contoh 2
+%% Diberikan variabel acak dengan PDF sebagai berikut:
+% 
+% latex: f(x) = \begin{cases} \frac{6}{5}(x^2+x) & 0\le x\le 1 \\ 0 & \text{x yang lain}. \end{cases}
+% 
+% Untuk menggambar grafik CDF-nya, pertama kita cari terlebih dahulu CDF
+% dari fungsi tersebut.
+% 
+% Untuk x pada interval
+%% latex: (- \infty,x)
+%% latex: F(x)= \int_{- \infty}^{x} f(x)\ dx
+%% latex: F(x)= \int_{- \infty}^{x} 0\ dx
+%% latex: F(x)= 0
+% 
+% Untuk x pada interval [0,1]
+%% latex: F(x)= \int_{- \infty}^{x} f(x)\ dx
+%% latex: F(x)= \int_{- \infty}^{0} f(x)\ dx + \int_{0}^{x} f(x)\ dx
+%% latex: F(x)= \int_{- \infty}^{0} 0\ dx + \int_{0}^{x} \frac{6}{5} (x^2+x)\ dx
+%% latex: F(x) = 0 + \frac{6}{5}(\frac{x^3}{3} + \frac{x^2}{2})
+%% latex: F(x) = \frac{6}{5}(\frac{x^3}{3} + \frac{x^2}{2})
+% 
+% Untuk x pada interval
+%% latex: (1, \infty)
+%% latex: F(x)= \int_{- \infty}^{x} f(x)\ dx
+%% latex: F(x)= \int_{- \infty}^{0} f(x)\ dx + \int_{0}^{1} f(x)\ dx + \int_{1}^{x} f(x)\ dx
+%% latex: F(x)= \int_{- \infty}^{0} 0\ dx + \int_{0}^{1} \frac{6}{5} (x^2+x)\ dx +  \int_{1}^{\infty} 0\ dx
+%% latex: F(x) = 0 + \frac{6}{5} (\frac{1^3}{3} + \frac{1^2}{2}) + 0
+%% latex: F(x) = \frac{6}{5} \frac{5}{6} = 1
+% 
+% Sehingga, diperoleh CDF :
+%% latex: F(x) = \begin{cases} 0 & x<0 \\ \frac{6}{5}(\frac{x^3}{3} + \frac{x^2}{2}) & 0\le x\le 1 \\ 1 & x>1. \end{cases}
+% 
+% Selanjutnya, akan kita gambarkan grafik CDF tersebut di EMT.
+%% Pertama, kita definisikan terlebih dahulu fungsi f(x) dengan
+% menggunakan fungsi function map.
+>function map f(x) ...
+$  if x<0 then return 0
+$  else if x>=0 and x<=1 then return (6/5)*((x^3/3)+(x^2/2))
+$  else return 1
+$  endif;
+$endfunction
+% Kemudian, kita akan menggambar grafik fungsi di atas dengan
+% menggunakan fungsi plot2d() pada interval x dari -1 sampai 2.
+>plot2d("f(x)",-1,2):
+% 
+% ----
+%% ---
+%% Nama: Mg. Ribka Yohanna Senduk
+%% NIM: 22305141038
+%% Kelas: Matematika B
+% 
+% * Sub Topik 7 : Tabel Frame Data dan Menyimpan Data
+% 
+% Tabel frame data adalah struktur data yang umum digunakan dalam
+% statistika untuk merepresentasikan data dalam bentuk tabel yang
+% terdiri dari baris dan kolom. Data frame memungkinkan untuk melakukan
+% analisis statistika dan manipulasi data dengan mudah. Tabel frame data
+% merupakan struktur data yang penting dalam statistika dan analisis
+% data.
+% 
+% Kita mencoba menampilkan tabel frame data survei yang berasal dari
+% buku online Jerman "Einführung in die Statistik mit R" oleh A. Handl,
+% dengan menggunakan perintah printfile("namafile",n); n disini bisa
+% kita gantikan dengan jumlah baris yang ingin ditampilkan.
+>printfile("table.dat",5);
+% Terdapat 7 kolom angka atau token (string) pada tabel tersebut.
+% Kemudian, dilakukan terjemahan pada token-token tersebut. Setelah itu,
+% tabel dibaca dari file “table.dat” dengan menggunakan terjemahan yang
+% kita buat.
+% 
+% Kita dapat menggunakan fungsi `strtokens()` yang berfungsi untuk
+% mendapatkan vektor string token dari string yang diberikan.
+% 
+% Dalam kasus ini, kita mendefinisikan tiga set token, yaitu:
+%% - `mf` yang berisi token "m" dan "f".
+%% - `yn` yang berisi token "y" dan "n".
+%% - `ev` yang berisi token "g", "vg", "m", "b", dan "vb".
+% 
+>mf:=["m","f"]; yn:=["y","n"]; ev:=strtokens("g vg m b vb");
+% Fungsi `strtokens()` digunakan untuk memecah string menjadi
+% token-token yang terpisah. Pada perintah `ev:=strtokens("g vg m b
+% vb")`, fungsi `strtokens()` digunakan untuk memecah string "g vg m b
+% vb" menjadi token-token yang terpisah, yaitu "g", "vg", "m", "b", dan
+% "vb".
+% 
+% Sedangkan pada variabel `mf` dan `yn` didefinisikan sebagai vektor
+% yang berisi token-token "m", "f", "y", dan "n", yang sudah
+% didefinisikan secara eksplisit, jadi tidak perlu menggunakan fungsi
+% `strtokens()` untuk memecah string menjadi token-token yang terpisah.
+% 
+% Set token tadi kita buat menjadi argumen 'tok' yang merupakan
+% terjemahan dari kolom tabel. Argumen ini tidak ada dalam daftar
+% parameter readtable(), jadi kita harus menyediakannya dengan ":=".
+>{MT,hd}=readtable("table.dat",tok2:=mf,tok4:=yn,tok5:=ev,tok7:=yn);
+>load over statistics;
+% Fungsi readtable() adalah fungsi yang digunakan untuk mengembalikan
+% satu set token. Token-token ini digunakan untuk menerjemahkan
+% nilai-nilai dalam tabel ke dalam angka.
+>writetable(MT[1:4],labc=hd,wc=5,tok2:=mf,tok4:=yn,tok5:=ev,tok7:=yn);
+% Fungsi writetable() digunakan untuk mencetak isi dari tabel. Argumen
+% labc digunakan untuk menentukan label kolom, wc digunakan untuk
+% menentukan lebar kolom, dan tok2, tok4, tok5, dan tok7 digunakan untuk
+% menentukan token yang sesuai dengan kolom yang berisi token dan bukan
+% angka.
+% 
+% Titik "." mewakili nilai-nilai, yang tidak tersedia.
+% 
+% Jika kita tidak ingin menentukan token untuk terjemahan terlebih
+% dahulu, kita hanya perlu menentukan, kolom mana yang berisi token dan
+% bukan angka.
+>ctok=[2,4,5,7]; {MT,hd,tok}=readtable("table.dat",ctok=ctok);
+% Terdapat string khusus NA="." yang ditafsirkan sebagai "Tidak
+% Tersedia", dan mendapatkan NAN (bukan angka) dalam tabel. Terjemahan
+% ini dapat diubah dengan parameter NA, dan NAval.
+>MT[4]
+% Berikut isi tabel dengan angka yang belum diterjemahkan.
+>writetable(MT,wc=5)
+>Table={{readtable("table.dat",ctok=ctok)}};
+>writetable(Table,ctok=ctok,wc=5);
+% Perintah yang menggunakan argumen ctok mencantumkan kolom yang berisi
+% token (bukan angka).
+% 
+% Kemudian, untuk mengembalikan nilai kolom tabel, melewatkan setiap
+% baris dengan nilai NAN (“.” dalam file), dan indeks kolom, yang berisi
+% nilai-nilai ini, kita dapat menggunakan fungsi 'tablecol()' yang juga
+% bisa digunakan untuk mengekstrak kolom dari tabel untuk tabel baru.
+>{c,i}=tablecol(MT,[5,6]);
+% Dalam perintah tersebut, {c,i} adalah dua variabel yang didefinisikan
+% untuk menampung nilai-nilai yang dikembalikan oleh fungsi`tablecol().
+% Variabel `c` akan berisi nilai-nilai kolom tabel, sedangkan variabel
+% `i` akan berisi indeks kolom yang berisi nilai-nilai tersebut. Kita
+% dapat menggunakan nilai-nilai ini untuk mengekstrak kolom dari tabel
+% untuk tabel baru.
+% 
+% Selanjutnya kita dapat mengekstrak kolom dari tabel untuk tabel baru.
+>j=[1,5,6]; writetable(MT[i,j],labc=hd[j],ctok=[2],tok=tok)
+% Dalam kode di atas, kita mendefinisikan variabel `j` sebagai vektor
+% yang berisi indeks kolom yang ingin diekstrak dari tabel. Kemudian,
+% kita menggunakan fungsi `writetable` untuk mengekstrak kolom-kolom
+% tersebut.
+% 
+% Kita juga dapat menentukan nilai rata-rata dari kolom-kolom tersebut.
+>MT=Table[1];
+% Perintah ini digunakan untuk menginisialisasi variabel `MT` dengan
+% nilai `1`. Ini berarti bahwa `MT` adalah tabel dengan satu baris dan
+% satu kolom. Kita dapat menggunakan variabel `MT` ini untuk melakukan
+% operasi lain pada tabel tersebut.
+>mean(tablecol(MT,6))
+% Coba untuk menghitung rata-rata pada kolom 2.
+>mean(tablecol(MT,2))
+% Kolom 2 pada Tabel tersebut hanya berisi jenis kelamin, yaitu 'm' dan
+% 'f'. Namun, kolom ke-2 tetap dapat dicari rata-ratanya karena 'm' dan
+% 'f' dapat dianggap sebagai nilai numerik. Nilai numerik tersebut dapat
+% dilihat menggunakan fungsi getstatistics().
+% 
+% Fungsi `getstatistics()` digunakan untuk mengembalikan elemen dalam
+% vektor, dan jumlahnya. Fungsi ini diterapkan pada nilai "m" dan "f" di
+% kolom kedua tabel. Hasilnya adalah vektor `xu` dan `count`.
+% 
+% Vektor `xu` berisi elemen unik dari vektor yang diberikan.
+%% Vektor `count` berisi jumlah kemunculan setiap elemen dalam vektor.
+>{xu,count}=getstatistics(tablecol(MT,2)); xu, count
+>writetable(count',labr=tok[xu])
+% Dari proses tersebut, kita mengetahui bahwa elemen unik dari m adalah
+% 1 dan elemen unik dari f adalah 3. Kita dapat menganggap 'm' sebagai
+% nilai 1 dan 'f' sebagai nilai 3. Kemudian, kita dapat menghitung nilai
+% mean sebagai berikut:
+% 
+% latex: \text{Mean = }\frac{\sum_{}^{}\text{xi}}{n}
+%% latex: \text{Mean = }\left[ \frac{\left( 1.12\right)+\left( 3.13 \right)}{25} \right]
+%% latex: \text{Mean = }\left[ \frac{\left( 12\right)+\left( 39 \right)}{25} \right]
+%% latex: \text{Mean = }\left( \frac{51}{25} \right) = 2.04
+% 
+% 
+% Selanjutnya terdapat fungsi `selecttable()`, yaitu fungsi yang
+% digunakan untuk mengembalikan tabel baru dengan nilai dalam satu kolom
+% yang dipilih dari vektor indeks.
+% 
+% Hal pertama yang perlu kita lakukan adalah mencari indeks dari dua
+% nilai kita di tabel token.
+>v:=indexof(tok,["m","f"])
+% Kemudian kita dapat memilih baris tabel, yang memiliki salah satu
+% nilai dalam v di kolom ke-2.
+>MT1:=MT[selectrows(MT,2,v)];
+>i:=sortedrows(MT1,2);
+% Kita dapat mencetak tabel dengan nilai yang diekstrak dan diurutkan di
+% kolom ke-2.
+% 
+% - Fungsi selectrows() digunakan untuk memilih baris tabel MT yang
+% memiliki salah satu nilai dalam v di baris ke-2.
+%% - Fungsi sortedrows() digunakan untuk mengurutkan tabel MT1
+% berdasarkan nilai dalam kolom ke-2, yaitu Sex, dengan urutan
+% pengurutan dari nilai terkecil ke nilai terbesar. Hasil pengurutan
+% tersebut disimpan dalam variabel i
+% 
+% Tabel yang dihasilkan akan terdiri dari tabel yang telah diurutkan
+% berdasarkan nilai dalam kolom ke-2, yaitu Sex, dengan urutan
+% pengurutan dari nilai terkecil ke nilai terbesar.
+>writetable(MT1[i],labc=hd,ctok=ctok,tok=tok,wc=7);
+% Kita juga dapat melakukan pengurutan dengan menghubungkan 2 kolom
+% sebagai berikut.
+>i=sortedrows(MT,[4,5]);  ...
+>  writetable(tablecol(MT[i],[4,5])',ctok=[1,2],tok=tok)
+% Kemudian untuk menghitung jumlah kemunculan setiap nilai dalam dua
+% kolom tabel yang berbeda kita dapat menggunakan fungsi
+% `getstatistics()`.
+>MT24=tablecol(MT,[2,4]); ...
+>{xu1,xu2,count}=getstatistics(MT24[1],MT24[2]); ...
+>writetable(count,labr=tok[xu1],labc=tok[xu2])
+% Dalam hal ini, MT24 adalah tabel yang terdiri dari kolom kedua dan
+% keempat dari tabel MT. Kemudian, fungsi `getstatistics()` akan
+% menghitung jumlah kemunculan setiap nilai dalam kolom-kolom ini.
+% Hasilnya disimpan dalam variabel `count`, yang kemudian dicetak dengan
+% nama kolom-kolom tabel sebagai label baris (m dan f) dan kolom(n dan
+% y). Nilai n dan y dalam tabel menunjukkan jumlah kemunculan nilai m
+% dan f dalam kolom-kolom tabel yang berbeda dan sebaliknya.
+% 
+% Tabel hasil tadi dapat kita tuliskan ke dalam file dengan cara
+% berikut.
+>filename="nyoba"; ...
+>writetable(count,labr=tok[xu1],labc=tok[xu2],file=filename);
+>{MT2,hd,tok2,hdr}=readtable(filename,>clabs,>rlabs); ...
+>writetable(MT2,labr=hdr,labc=hd)
+>fileremove(filename);
+% Pertama, tabel dapat ditulis ke dalam file dengan menggunakan perintah
+% `writetable`. Pada contoh kode tersebut, tabel yang akan ditulis
+% adalah `count`, dengan label baris dan kolom yang ditentukan oleh
+% `tok[xu1]` dan `tok[xu2]`, dan nama file yang ditentukan oleh
+% `filename`.
+% 
+% Kedua, tabel dapat dibaca dari file yang telah ditulis sebelumnya
+% dengan menggunakan perintah `readtable`. Pada contoh kode tersebut,
+% tabel yang dibaca adalah `MT2`, dengan label baris dan kolom yang
+% ditentukan oleh `rlabs` dan `clabs`, dan nama file yang ditentukan
+% oleh `filename`.
+% 
+% Terakhir, file yang telah ditulis dan dibaca dapat dihapus dengan
+% menggunakan perintah `fileremove`, dengan nama file yang ditentukan
+% oleh `filename`.
+% 
+% * Sub Topik 8 : Perhitungan untuk Uji Statistika
+% 
+% Salah satu fitur yang penting dalam analisis statistika adalah
+% penggunaan uji statistika untuk mengambil keputusan berdasarkan data
+% yang dianalisis. Uji statistika digunakan untuk menguji hipotesis,
+% memeriksa keandalan pengamatan, dan membuat inferensi tentang populasi
+% berdasarkan sampel data. Banyak uji statistika tersebut yang bisa
+% diterapkan di Euler. Semua uji dalam Euler ini akan mengembalikan
+% kesalahan yang diterima jika hipotesis nol ditolak.
+% 
+% ** Simulasi Monte Carlo
+%% Simulasi Monte Carlo adalah tipe simulasi probabilistik untuk mencari
+% penyelesaiaan masalah dengan sampling dari proses random. Dasar
+% simulasi Monte Carlo adalah mengadakan percobaan (eksperimen) pada
+% elemen-elemen probabilistik melalui sampling acak.
+% 
+% Simulasi kejadian acak tersebut dapat dilakukan menggunakan Euler.
+% Berikut ini contoh yang mensimulasikan 1000 kali pelemparan dadu, dan
+% ditampilkan distribusi jumlahnya.
+>ds:=sum(intrandom(1000,3,6));  fs=getmultiplicities(3:18,ds)
+% Kita menggunakan fungsi intrandom() untuk menghasilkan bilangan bulat
+% acak antara 3 dan 6, dan menjumlahkannya sebanyak 1000 kali. Kemudian,
+% kita menggunakan fungsi getmultiplicities() untuk menghitung frekuensi
+% kemunculan dari setiap jumlah yang muncul dalam hasil penjumlahan.
+% Hasilnya disimpan dalam variabel fs.
+% 
+% Penggunaan 3 dan 18 dalam argumen getmultiplicities() adalah karena
+% kita ingin menghitung frekuensi kemunculan dari setiap jumlah yang
+% muncul dalam hasil penjumlahan 3 lemparan dadu. Jumlah minimum
+% penjumlahan 3 dadu adalah 3, dan jumlah maksimum penjumlahan 3 dadu
+% adalah 18.
+% 
+% Selanjutnya dapat direncanakan.
+>columnsplot(fs,lab=3:18):
+% Penggunaan fungsi columnsplot() di atas adalah untuk menampilkan
+% grafik kolom yang menunjukkan distribusi jumlah yang muncul dalam
+% hasil penjumlahan. Argumen `lab=3:18` pada digunakan untuk menentukan
+% label sumbu horizontal pada grafik kolom yang dihasilkan, yaitu
+% menunjukkan jumlah yang muncul dalam hasil penjumlahan 3 lemparan
+% dadu, mulai dari 3 hingga 18. Dengan demikian, grafik kolom yang
+% dihasilkan akan menunjukkan frekuensi kemunculan dari setiap jumlah
+% antara 3 dan 18 yang muncul dalam hasil penjumlahan 3 lemparan dadu.
+% 
+% Grafik yang ditampilkan ini dapat berubah-ubah karena sampel angka
+% yang diambil acak.
+% 
+% Dalam kasus ini, kita ingin menentukan distribusi jumlah yang muncul
+% dalam hasil penjumlahan 3 lemparan dadu. Untuk menentukan distribusi
+% ini, kita perlu menghitung banyaknya cara bilangan k dapat dinyatakan
+% sebagai jumlah dari 3 bilangan dalam rentang 1 sampai 6. Ini tidak
+% mudah dilakukan secara langsung, sehingga kita menggunakan rekursi
+% lanjutan untuk menyelesaikan masalah ini.
+>function map countways (k; n, m) ...
+$   if n==1 then return k>=1 && k<=m
+$   else
+$     sum=0;
+$     loop 1 to m; sum=sum+countways(k-#,n-1,m); end;
+$     return sum;
+$   end
+$endfunction
+% Fungsi countways() menghitung banyaknya cara bilangan k dapat
+% dinyatakan sebagai jumlah dari n bilangan dalam rentang 1 sampai m.
+% Ini bekerja secara rekursif dengan cara yang jelas. Fungsi ini
+% mengembalikan jumlah cara yang mungkin untuk mengekspresikan k sebagai
+% jumlah dari n bilangan dalam rentang 1 sampai m.
+% 
+% Kemudian kita menggunakan fungsi countways() untuk menghitung
+% banyaknya cara bilangan k dapat dinyatakan sebagai jumlah dari 3
+% bilangan dalam rentang 1 sampai 6. Hasil perhitungan tersebut akan
+% kita simpan dalam variabel cw.
+>cw=countways(3:18,3,6)
+% Kemudian nilai-nilai kita peroleh dari perhitungan tadi dapat
+% direpresentasikan ke dalam plot.
+>plot2d(cw/6^3*1000,>add); plot2d(cw/6^3*1000,>points,>add):
+% ** Uji Chi-Square
+% 
+% Untuk melakukan uji chi^2 (chi-squared) kita menggunakan fungsi
+% chitest(). Fungsi ini digunakan untuk membandingkan frekuensi
+% observasi dengan frekuensi yang diharapkan. Dalam konteks ini, vektor
+% x merepresentasikan frekuensi observasi, sedangkan vektor y
+% merepresentasikan frekuensi yang diharapkan. Misalnya, jika dari
+% sampel 100 orang ditemukan 40 pria, maka vektor observasi x adalah
+% [40,60], dan vektor harapan y mungkin [50,50]. Uji chi^2 digunakan
+% untuk menilai sejauh mana sampel tersebut sesuai dengan frekuensi yang
+% diharapkan.
+% 
+% Kita coba lakukan pengujian lemparan dadu untuk distribusi seragam.
+% Pada 600 lemparan diperoleh nilai sebagai berikut, yang dimasukkan ke
+% uji chi-square.
+>chitest([90,103,114,101,103,89],dup(100,6)')
+% Dalam kasus ini, argumen pertama (vektor x) adalah
+% [90,103,114,101,103,89], sedangkan argumen kedua (vektor y) adalah
+% dup(100,6). Fungsi dup() digunakan untuk menghasilkan array yang
+% terdiri dari 6 elemen, masing-masing bernilai 100.
+>dup(100,6)
+>dup(100,6)'
+% Uji chi-square juga memiliki mode yang menggunakan simulasi Monte
+% Carlo untuk menguji statistik. Hasilnya harus hampir sama. Parameter
+% >p menginterpretasikan vektor-y sebagai vektor probabilitas.
+>chitest([90,103,114,101,103,89],dup(1/6,6)',>p,>montecarlo)
+% Pada contoh tersebut, pelemparan dadu memiliki 6 kemungkinan hasil
+% yang sama mungkin terjadi. Oleh karena itu, probabilitas setiap hasil
+% adalah 1/6. Fungsi dup digunakan untuk menghasilkan vektor yang berisi
+% 6 elemen yang sama, yaitu 1/6. Dengan demikian, argumen dup(1/6,6)
+% menghasilkan vektor probabilitas yang sesuai untuk uji chi-square pada
+% pelemparan dadu.
+% 
+% Kesalahan ini terlalu besar. Jadi tidak dapat dilakukan penolakan
+% terhadap pemerataan distribusi. Hal ini tidak membuktikan bahwa
+% pelemparan dadu terjadi secara adil. Namun hipotesis tidak dapat
+% ditolak.
+% 
+% Misalnya dihasilkan 1000 lemparan dadu menggunakan generator angka
+% acak kemudian dilakukan pengujian yang sama.
+>n=1000; t=random([1,n*6]); chitest(count(t*6,6),dup(n,6)')
+% Dalam pengujian ini, 1000 lemparan dadu dihasilkan menggunakan
+% generator angka acak. Kemudian, dilakukan pengujian chi-square untuk
+% menguji apakah hasil lemparan dadu tersebut memenuhi distribusi
+% uniform atau tidak. Hasil pengujian ini akan berbeda tiap kali kita
+% menjalankan perintah karena dilakuan menggunakan generator angka acak
+% tadi.
+% 
+% note: Distribusi uniform adalah suatu bentuk distribusi probabilitas
+% di mana setiap kemungkinan hasil memiliki kemungkinan yang sama untuk
+% terjadi.
+% 
+% ** Uji-T
+%% Uji-t adalah sebuah metode statistik yang digunakan untuk menguji
+% perbedaan signifikan antara rata-rata dua kelompok yang berbeda.
+% 
+% Misalnya, akan dilakukan pengujian nilai rata-rata dari 100 elemen
+% data menggunakan uji-t.
+>s=200+normal([1,100])*10; ...
+>ttest(mean(s),dev(s),100,200)
+% Dalam syntax tersebut, normal([1,100]) menghasilkan 100 angka acak
+% yang diambil dari distribusi normal dengan nilai rata-rata 0 dan
+% simpangan baku 1. Kemudian, nilai-nilai tersebut dikalikan dengan 10
+% dan ditambahkan dengan 200 untuk menghasilkan sampel data dengan nilai
+% rata-rata 200 dan simpangan baku 10.
+% 
+% Setelah itu, dilakukan uji-t menggunakan fungsi ttest(), yaitu  untuk
+% menguji hipotesis tentang apakah rata-rata sampel s sama dengan 200.
+% Fungsi ttest() membutuhkan nilai rata-rata dari data, standar deviasi
+% data, banyaknya data, dan nilai rata-rata yang diuji.
+% 
+% Dari nilai uji-t yang diperoleh, kita dapat mengetahui bahwa terdapat
+% perbedaan antara nilai rata-rata yang diuji dengan nilai rata-rata
+% yang diharapkan. Namun, untuk menentukan apakah perbedaan tersebut
+% signifikan atau tidak, kita perlu membandingkan nilai uji-t dengan
+% nilai kritis uji-t yang sesuai dengan tingkat signifikansi yang
+% digunakan.
+% 
+% ***
+% 
+% Kemudian kita akan melakukan pengujian dua pengukuran untuk rata-rata
+% yang sama dengan menolak hipotesis bahwa rata-rata nya sama jika
+% hasilnya <0,05.
+>tcomparedata(normal(1,10),normal(1,10))
+% Hasil keluaran adalah nilai p yang dihasilkan dari uji-t. Jika nilai p
+% < 0.05, kita dapat menolak hipotesis nol bahwa rata-ratanya sama.
+% Dalam contoh di atas, nilai p lebih besar dari 0.05, sehingga tidak
+% ada cukup bukti untuk menolak hipotesis nol.
+% 
+% Jika ditambahkan bias ke satu distribusi, akan diperoleh lebih banyak
+% penolakan.
+>tcomparedata(normal(1,10),normal(1,10)+2)
+% ** Uji Independensi
+%% Uji independensi adalah salah satu uji statistik yang digunakan untuk
+% mengetahui apakah ada hubungan antara dua variabel kategorik, dengan
+% kata lain untuk mengetahui independensi antara variabel baris dan
+% kolom. Uji ini berguna untuk mengukur perbedaan pengamatan dan
+% menaksir frekuensi suatu pengamatan dalam kategori tertentu.
+% 
+% Contoh berikut berisi hasil dari dua kelompok orang (pria dan wanita,
+% katakanlah) memilih satu dari enam partai.
+>A=[23,37,43,52,64,74;27,39,41,49,63,76]; ...
+>  writetable(A,wc=6,labr=["m","f"],labc=1:6)
+>tabletest(A)
+>writetable(expectedtable(A),wc=6,dc=1,labr=["m","f"],labc=1:6)
+>contingency(A)
+% ** Uji-F (metode ANOVA)
+% 
+% Analisis varians (F-test) merupakan uji statistika yang dapat kita
+% gunakan untuk menguji tiga sampel data yang terdistribusi normal untuk
+% nilai rata-rata yang sama. Metode tersebut dinamakan ANOVA (analysis
+% of variance). Untuk melakukan uji ini kita menggunakan fungsi
+% varanalysis().
+>x1=[109,111,98,119,91,118,109,99,115,109,94]; mean(x1),
+>x2=[120,124,115,139,114,110,113,120,117]; mean(x2),
+>x3=[120,112,115,110,105,134,105,130,121,111]; mean(x3)
+>varanalysis(x1,x2,x3)
+% Dalam pengujian hipotesis statistik di atas, hipotesis nol
+% mengasumsikan bahwa nilai rata-rata ke-3 set data (x1,x2,x3) sama.
+% Namun, berdasarkan analisis varians telah kita lakukan, hipotesis nol
+% dapat ditolak dengan probabilitas kesalahan 1,3%. Ini berarti bahwa
+% ada perbedaan yang signifikan secara statistik antara rata-rata dari
+% ketiga set angka.
+% 
+% * Sub Topik 9 : Menyimpan Data Hasil Analisis
+% 
+% Data-data yang kita gunakan dalam melakukan analisis statistika dapat
+% kita simpan ke dalam suatu file sehingga ketika kelak ingin digunakan
+% lagi, data tersebut masih ada di file penyimpanan kita. Tak hanya itu,
+% hasil dari analisis statistika yang sudah kita lakukan pun dapat kita
+% simpan ke dalam suatu file.
+% 
+% Berikut adalah cara menyimpan/menulis data ke suatu file.
+>a=random(1,100); mean(a); dev(a);
+>filename="coba";
+% Setelah memberi nama untuk file, kita akan menulis vektor a ke dalam
+% file dengan menggunakan fungsi writematrix() dan menggunakan fungsi
+% readmatrix() untuk membaca data.
+>writematrix(a',filename);
+>a=readmatrix(filename)';
+>fileremove(filename);
+% File yang telah ditulis dan dibaca dapat dihapus dengan menggunakan
+% perintah fileremove().
+% 
+% Fungsi writematrix() atau writetable() dapat dikonfigurasi untuk
+% bahasa lain.
+% 
+% Misalnya, jika ada sistem bahasa Indonesia (titik desimal dengan
+% koma), Excel memerlukan nilai dengan koma desimal yang dipisahkan oleh
+% titik koma dalam file csv (defaultnya adalah nilai yang dipisahkan
+% koma). File berikut "yanglain.csv" akan muncul di folder cuurent.
+>filename="yanglain.csv";
+>writematrix(random(5,3),file=filename,separator=",");
+% Sekarang file ini dapat dibuka dengan Excel bahasa Indonesia secara
+% langsung. File yang tersimpan di penyimpanan kita akan berisi data
+% dengan 5 baris dan 3 kolom yang tiap datanya dipisahkan oleh tanda
+% koma (,).
+>fileremove(filename);
+% Kita juga bisa memiliki string dengan token seperti berikut ini.
+>s1:="f m m f m m m f f f m m f";
+>s2:="f f f m m f f";
+% Untuk memudahkan, kita bisa terlebih dahulu menerjemahkan ke vektor
+% token.
+>tok:=["f","m"];
+% Kemudian, kita hitung berapa frekuensi kemunculan setiap token dalam
+% string, dan memasukkan hasilnya ke dalam tabel.
+>M:=getmultiplicities(tok,strtokens(s1))_ ...
+>  getmultiplicities(tok,strtokens(s2))
+% Agar lebih mudah dipahami ketika melihat file tabel, kita perlu
+% menulis label atau nama untuk setiap kolom dan baris.
+>writetable(M,labc=tok,labr=1:2,wc=8)
+% Kemudian kita akan mencoba untuk menggantikan data baru ke file lama
+% dengan menghapus semua data lama, dan menulis lagi data baru yang akan
+% disimpan.
+>file="nyobalagi"; open(file,"w");
+>writeln("A,B,C"); writematrix(random(3,3));
+>close();
+>printfile(file)
+% Hasil di atas juga akan muncul pada file "nyobalagi" yang ada di file
+% penyimpanan kita. Terakhir, jika ingin menghapus, sama seperti cara
+% sebelumnya, kita dapat menggunakan syntax fileremove().
+>
